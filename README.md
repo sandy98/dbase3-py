@@ -39,3 +39,100 @@ print(test.filter('name', 'ja', comp_func=self.istartswith))
 ```
 
 The module itself, DBaseFile class and all its methods are thoroughly documented, so it should be easy to follow up.
+
+
+
+## Usage
+
+Here is an example of how to use the library:
+
+```python
+from dbase3 import DBase3
+
+# Open an existing database file
+db = DBase3('path/to/database.dbf')
+
+# Add a new record
+db.add_record({
+    'Name': 'John Doe',
+    'Age': 30,
+    'Birth': '1990-01-01'
+})
+
+# Update an existing record
+db.update_record(0, {
+    'Name': 'Jane Doe',
+    'Age': 25
+})
+
+# Print all records
+for record in db:
+    print(record)
+```
+
+## Documentation
+
+### Classes
+
+#### `DBase3`
+
+Class to manipulate DBase III database files.
+
+- `__init__(self, filename: str)`: Initializes an instance of DBase3.
+- `__del__(self)`: Closes the database file when the instance is destroyed.
+- `init(self)`: Initializes the database structure by reading the header and fields.
+- 
+
+add_record(self, record_data: dict)
+
+: Adds a new record to the database.
+
+- `update_record(self, index: int, record_data: dict)`: Updates an existing record in the database.
+- `istartswith(f: str, v: str) -> bool`: Checks if the string `f` starts with the string `v`, ignoring case.
+- `iendswith(f: str, v: str) -> bool`: Checks if the string `f` ends with the string `v`, ignoring case.
+- 
+
+create(cls, filename: str, fields: List[Tuple[str, FieldType, int, int]])
+
+: Creates a new DBase III database file with the specified fields.
+
+### Methods
+
+- `dump_record(self, key, record)`: Writes a record (dictionary with field names and field values) to the database at the specified index.
+- `__len__(self)`: Returns the number of records in the database, including records marked to be deleted.
+- `__getitem__(self, key)`: Returns a single record or a list of records from the database.
+- `__iter__(self)`: Returns an iterator over the records in the database.
+- `__str__(self)`: Returns a string representation of the database.
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+## Contact
+
+For any questions or suggestions, please contact [yourname](mailto:youremail@example.com).
+
+```
+
+### 8. Añadir y hacer commit del archivo README.md
+
+Añade el archivo `README.md` al repositorio y haz un commit:
+
+```bash
+git add README.md
+git commit -m "Add README.md"
+```
+
+### 9. Subir los cambios a GitHub
+
+Sube los cambios al repositorio remoto en GitHub:
+
+```bash
+git push
+```
+
+¡Y eso es todo! Ahora tu proyecto debería estar disponible públicamente en GitHub.
