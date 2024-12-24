@@ -41,40 +41,11 @@ print(test.filter('name', 'ja', comp_func=self.istartswith))
 The module itself, DBaseFile class and all its methods are thoroughly documented, so it should be easy to follow up.
 
 
-
-## Usage
-
-Here is an example of how to use the library:
-
-```python
-from dbase3 import DBase3
-
-# Open an existing database file
-db = DBase3('path/to/database.dbf')
-
-# Add a new record
-db.add_record({
-    'Name': 'John Doe',
-    'Age': 30,
-    'Birth': '1990-01-01'
-})
-
-# Update an existing record
-db.update_record(0, {
-    'Name': 'Jane Doe',
-    'Age': 25
-})
-
-# Print all records
-for record in db:
-    print(record)
-```
-
 ## Documentation
 
 ### Classes
 
-#### `DBase3`
+#### `DBaseFile`
 
 Class to manipulate DBase III database files.
 
@@ -114,25 +85,6 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 ## Contact
 
-For any questions or suggestions, please contact [yourname](mailto:youremail@example.com).
+For any questions or suggestions, please contact [Domingo E. Savoretti](mailto:esavoretti@gmail.com).
 
 ```
-
-### 8. Añadir y hacer commit del archivo README.md
-
-Añade el archivo `README.md` al repositorio y haz un commit:
-
-```bash
-git add README.md
-git commit -m "Add README.md"
-```
-
-### 9. Subir los cambios a GitHub
-
-Sube los cambios al repositorio remoto en GitHub:
-
-```bash
-git push
-```
-
-¡Y eso es todo! Ahora tu proyecto debería estar disponible públicamente en GitHub.
