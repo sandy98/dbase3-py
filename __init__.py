@@ -1,0 +1,6 @@
+__version__ = "0.1.0"
+__author__ = "Jorge A. Gomes"
+__email__ = "esavoretti@gmail.com"
+__license__ = "MIT"
+__url__ = "https://github.com/sandy98/dbase3-py"
+__description__ = "A simple library to read and write dbase III files."
