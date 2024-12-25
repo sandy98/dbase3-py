@@ -1,14 +1,14 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='dbase-iii',
-    version='0.1.0',
+    name='dbase3-py',
+    version='0.1.2',
     description='A Python library to manipulate DBase III database files',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    author='Your Name',
-    author_email='youremail@example.com',
-    url='https://github.com/yourusername/dbase-iii-python',
+    author='Domingo E. Savoretti',
+    author_email='esavoretti@gmail.com',
+    url='https://github.com/sandy98/dbase3-py',
     packages=find_packages(),
     classifiers=[
         'Programming Language :: Python :: 3',
