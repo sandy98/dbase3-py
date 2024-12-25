@@ -8,5 +8,6 @@ venv-dbase-iii/
 kids.url
 test_dbase3.py
 test.dbf
+setup.sh
 
 
