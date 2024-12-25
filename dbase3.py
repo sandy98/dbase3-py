@@ -521,28 +521,14 @@ class DbaseFile:
     
 
 def testdb():
-    global medicos, instits, test
+    global test
     
-    medicos = DbaseFile('db/medicos.dbf')
-    print(medicos)
-    print(list(map(lambda r: r['NOMBRE'], 
-    medicos.filter('nombre', 'savo', 
-    comp_func=lambda f, v: f.lower().startswith(v.lower())))))
-    print()
-
-    instits = DbaseFile('db/instit.dbf')
-    print(instits)
-    l = instits.filter('id', 149, comp_func=lambda f, v: f > v)
-    l.sort(key=lambda r: r['id'])
-    print(l)
-    print()
-
-    if os.path.exists('db/test.dbf'):
+    if os.path.exists('test.dbf'):
         # os.remove('db/test.dbf')
-        test = DbaseFile('db/test.dbf')
+        test = DbaseFile('test.dbf')
         # test.add_record('River Plate', 2024 - 1901)
     else:
-        test = DbaseFile.create('db/test.dbf',
+        test = DbaseFile.create('test.dbf',
                             [('name', FieldType.CHARACTER.value, 50, 0),
                              ('age', FieldType.NUMERIC.value, 3, 0)])
         test.add_record('John Doe', 30)
