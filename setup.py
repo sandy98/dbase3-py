@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-from __init__ import __version__
+from dbase3_py import __version__
 
 setup(
     name='dbase3_py',
@@ -11,7 +11,7 @@ setup(
     author_email='esavoretti@gmail.com',
     url='https://github.com/sandy98/dbase3-py',
     packages=find_packages(),
-    py_modules=['dbase3'],  # Asegúrate de incluir el módulo aquí
+    # py_modules=['dbase3'],  # Asegúrate de incluir el módulo aquí
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
