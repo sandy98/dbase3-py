@@ -7,4 +7,6 @@ venv-dbase-iii/
 *.pyo
 kids.url
 test_dbase3.py
+test.dbf
+
 
