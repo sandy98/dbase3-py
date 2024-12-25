@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 from __init__ import __version__
 
 setup(
-    name='dbase3-py',
+    name='dbase3_py',
     version=__version__,
     description='A Python library to manipulate DBase III database files',
     long_description=open('README.md').read(),
