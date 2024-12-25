@@ -425,6 +425,44 @@ class DbaseFile:
         Returns index of the first record found, or -1 if no record meeting given criteria is found.
         """ 
         return self.search(fieldname, value, start, "index", comp_func)
+
+    def list(self, start=0, stop=None, fieldsep="|", recordsep='\n', records:list=None):
+        """
+        Returns a list of records from the database.
+        """
+        if start is None:
+            start = 0
+        if stop is None:
+            stop = self.header.records
+        l = records or [self.get_record(i) for i in range(start, stop)]
+        return recordsep.join(fieldsep.join(str(record[field.name.decode('latin1')]) for field in self.fields) for record in l)
+
+    def csv(self, start=0, stop=None, records:list = None):
+        """
+        Returns a CSV string with the records in the database.
+        """
+        return self.list(start, stop, ",", "\n", records)
+    
+    def table(self, start=0, stop=None, records:list = None):
+        """
+        Returns a table string with the records in the database.
+        """
+        def _format_field(field, record):
+            if field.type == ord(FieldType.CHARACTER.value):
+                return record.get(field.name.decode('latin1')).ljust(field.length + 2)
+            else: 
+                return str(record.get(field.name.decode('latin1'))).rjust(field.length + 2)
+            
+        if start is None:
+            start = 0
+        if stop is None:
+            stop = self.header.records
+        l = records or [self.get_record(i) for i in range(start, stop)]
+        line_bracket = "+"
+        line_divider = line_bracket + line_bracket.join("-" * (field.length + 2) for field in self.fields) + line_bracket + "\n"
+        header_line = "|" + "|".join(field.name.decode('latin1').center(field.length + 2) for field in self.fields) + "|" + "\n"
+        record_lines =  ('\n' + line_divider).join("|" + "|".join(_format_field(field, record) for field in self.fields) + "|" for record in l)
+        return line_divider + header_line + line_divider + record_lines + "\n" + line_divider
     
     def filter(self, fieldname, value, comp_func=None):
         """
