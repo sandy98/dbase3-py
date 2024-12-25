@@ -11,6 +11,7 @@ setup(
     author_email='esavoretti@gmail.com',
     url='https://github.com/sandy98/dbase3-py',
     packages=find_packages(),
+    py_modules=['dbase3'],  # Asegúrate de incluir el módulo aquí
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
