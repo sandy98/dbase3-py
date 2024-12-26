@@ -1,5 +1,8 @@
 db/
 __pycache__/
+build/
+dist/
+dbase3_py.egg-info/
 docs/
 third-party/
 venv-dbase-iii/
@@ -9,5 +12,4 @@ kids.url
 test_dbase3.py
 test.dbf
 setup.sh
-
 

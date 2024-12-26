@@ -24,7 +24,7 @@ cd dbase3-py
 ## Usage
 
 ```python
-from dbase3 import DBaseFile, FieldType
+from dbase3_py.dbase3 import DBaseFile, FieldType
 test = DbaseFile.create('db/test.dbf',
                     [('name', FieldType.CHARACTER.value, 50, 0),
                         ('age', FieldType.NUMERIC.value, 3, 0)])
