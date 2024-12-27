@@ -72,7 +72,7 @@ Class to manipulate DBase III database files.
 
 ### Data searching/filtering methods
 
--  `search(self, fieldname, value, start=0, funcname="", comp_func=None)`:         Searches for a record with the specified value in the specified field, starting from the specified index, for which the specified comparison function returns True.
+-  `search(self, fieldname, value, start=0, funcname="", comp_func=None)`: Searches for a record with the specified value in the specified field, starting from the specified index, for which the specified comparison function returns True.
 -  `find(self, fieldname, value, start=0, comp_func=None)`:
 -  `index(self, fieldname, value, start=0, comp_func=None)`:
 -  `filter(self, fieldname, value, comp_func=None)`:
