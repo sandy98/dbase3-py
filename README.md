@@ -72,10 +72,10 @@ Class to manipulate DBase III database files.
 
 ### Data searching/filtering methods
 
--  `search(self, fieldname, value, start=0, funcname="", comp_func=None)`: Searches for a record with the specified value in the specified field, starting from the specified index, for which the specified comparison function returns True.
+-  `search(self, fieldname, value, start=0, funcname="", comp_func=None)`: Searches for a record with the specified value in the specified field, starting from the specified index, for which the specified comparison function returns True. Returns a tuple with index:int and record:dict
 -  `find(self, fieldname, value, start=0, comp_func=None)`: Wrapper for search() with funcname="find". Returns the first record (dictionary) found, or None if no record meeting given criteria is found.
--  `index(self, fieldname, value, start=0, comp_func=None)`:
--  `filter(self, fieldname, value, comp_func=None)`:
+-  `index(self, fieldname, value, start=0, comp_func=None)`:  Wrapper for search() with funcname="index". Returns index of the first record found, or -1 if no record meeting given criteria is found.
+-  `filter(self, fieldname, value, comp_func=None)`: Returns a list of records (dictionaries) that meet the specified criteria.
 
 ### Data listing methods
 
