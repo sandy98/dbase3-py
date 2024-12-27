@@ -1,6 +1,6 @@
 # DBase III Python Library
 
-This project provides a Python library to manipulate DBase III database files. It allows reading, writing, adding, and updating records in the database.
+Python library meant to manipulate DBase III database files. It allows reading, writing, adding, and updating records in the database.
 
 Even though this file format for databases is largely no longer in use, the present work is a minitool useful to retrieve legacy data, as much as a tribute to a beautiful part of computer history.
 
@@ -73,7 +73,7 @@ Class to manipulate DBase III database files.
 ### Data searching/filtering methods
 
 -  `search(self, fieldname, value, start=0, funcname="", comp_func=None)`: Searches for a record with the specified value in the specified field, starting from the specified index, for which the specified comparison function returns True.
--  `find(self, fieldname, value, start=0, comp_func=None)`:
+-  `find(self, fieldname, value, start=0, comp_func=None)`: Wrapper for search() with funcname="find". Returns the first record (dictionary) found, or None if no record meeting given criteria is found.
 -  `index(self, fieldname, value, start=0, comp_func=None)`:
 -  `filter(self, fieldname, value, comp_func=None)`:
 
