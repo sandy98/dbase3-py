@@ -46,6 +46,15 @@ print(test.filter('name', 'ja', comp_func=self.istartswith))
 
 The module itself, DBaseFile class and all its methods are thoroughly documented, so it should be easy to follow up.
 
+Esentially, each instance of DBaseFile, be it instanced through an existing DBase III file, or created through the factory method DBaseFile.create(filename) is a list like object with indexing capabilities, which also acts as an iterator through the records present in the .dbf file. It also supports the 'len' method, reporting the number of records present in the database, even those marked for deletion.
+On top of that, there is a group of methods meant for data manipulation (add_record for inserts, update_record for updates and del_record for marking/unmarking deletions).
+There is also a group of methods (search, index, find, filter) to aid in retrieving selected data.
+
+At it present stage of development, there is not support for memo fields or index fields, though this is planned for future releases, should enough interest arise.
+It's also planned an `exec` method to execute SQL-like statements. not functional right now.
+
+For further information see the documentation below.
+
 ## Documentation
 
 ### Classes
