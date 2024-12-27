@@ -17,92 +17,29 @@ Para instalar la biblioteca, clona este repositorio y navega al directorio del p
 ```bash
 git clone https://github.com/yourusername/dbase-iii-python.git
 cd dbase-iii-pythonfrom dbase3_py import DBase3
-
-# Abrir un archivo de base de datos existente
-db = DBase3('path/to/database.dbf')
-
-# Agregar un nuevo registro
-db.add_record({
-    'Name': 'John Doe',
-    'Age': 30,
-    'Birth': '1990-01-01'
-})
-
-# Actualizar un registro existente
-db.update_record(0, {
-    'Name': 'Jane Doe',
-    'Age': 25
-})
-
-# Imprimir todos los registros
-for record in db:
-    print(record)
-
-To provide multiple language versions of your 
-
-README.md
-
- file, you can create separate files for each language and link them from the main 
-
-README.md
-
-. Here’s how you can proceed:
-
-### 1. Create Separate README Files for Each Language
-
-Create `README_es.md` for Spanish and `README_it.md` for Italian. Here’s an example of how you can structure these files:
-
-#### `README_es.md` (Spanish)
-
-```markdown
-# Biblioteca Python para DBase III
-
-Este proyecto proporciona una biblioteca de Python para manipular archivos de bases de datos DBase III. Permite leer, escribir, agregar y actualizar registros en la base de datos.
-
-## Características
-
-- Leer archivos de bases de datos DBase III
-- Escribir en archivos de bases de datos DBase III
-- Agregar nuevos registros
-- Actualizar registros existentes
-- Filtrar y buscar registros
-
-## Instalación
-
-Para instalar la biblioteca, clona este repositorio y navega al directorio del proyecto:
-
-```bash
-git clone https://github.com/yourusername/dbase-iii-python.git
-cd dbase-iii-python
 ```
 
 ## Uso
 
-Aquí tienes un ejemplo de cómo usar la biblioteca:
-
-```python
-from dbase3_py import DBase3
-
-# Abrir un archivo de base de datos existente
+### Abrir un archivo de base de datos existente
 db = DBase3('path/to/database.dbf')
 
-# Agregar un nuevo registro
+### Agregar un nuevo registro
 db.add_record({
     'Name': 'John Doe',
     'Age': 30,
     'Birth': '1990-01-01'
 })
 
-# Actualizar un registro existente
+### Actualizar un registro existente
 db.update_record(0, {
     'Name': 'Jane Doe',
     'Age': 25
 })
 
-# Imprimir todos los registros
+### Imprimir todos los registros
 for record in db:
     print(record)
-```
 
 ## Documentación
 
@@ -141,7 +78,5 @@ Este proyecto está licenciado bajo la Licencia MIT. Consulta el archivo LICENSE
 
 Para cualquier pregunta o sugerencia, por favor contacta a [Domingo E. Savoretti](mailto:esavoretti@gmail.com).
 
-```
 
 
-```

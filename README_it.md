@@ -1,7 +1,4 @@
 
-#### `README_it.md` (Italian)
-
-```markdown
 # Libreria Python per DBase III
 
 Questo progetto fornisce una libreria Python per manipolare i file di database DBase III. Consente di leggere, scrivere, aggiungere e aggiornare i record nel database.
@@ -87,4 +84,3 @@ Questo progetto è concesso in licenza sotto la Licenza MIT. Vedi il file LICENS
 ## Contatto
 
 Per qualsiasi domanda o suggerimento, si prega di contattare [Domingo E. Savoretti](mailto:esavoretti@gmail.com).
-```
