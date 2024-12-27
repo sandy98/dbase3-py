@@ -79,9 +79,9 @@ Class to manipulate DBase III database files.
 
 ### Data listing methods
 
--  ``:
--  ``:
--  ``:
+-  `list(self, start=0, stop=None, fieldsep="|", recordsep='\n', records:list=None)`: Returns a list of records from the database, starting at 'start', ending at 'stop' or EOF, having fields separated by 'fieldsep' and records separated by '\n'. If 'records' is not None, the provided list is used instead of retrieving values from the database.
+-  `csv(self, start=0, stop=None, records:list = None)`: Wrapper for 'list', using ',' as fieldsep.
+-  `csv(self, start=0, stop=None, records:list = None)`: Retrieves selected records using ad-hoc format, same as provided by sqlite3 CLI in .table mode.
 
 ### Static Methods (Auxiliary functions for searching/filtering)
 
