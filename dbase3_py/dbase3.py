@@ -199,6 +199,62 @@ class DbaseFile:
         """
         self.file.close()
 
+    def __len__(self):
+        """
+        Returns the number of records in the database, including records marked to be deleted.
+        """
+        return self.header.records
+    
+    def __getitem__(self, key):
+        """
+        Returns from the database a single record (dictionary with field names and field values) 
+        or a list of them (if a slice is used).
+        """
+        if isinstance(key, slice):
+            start = key.start or 0
+            stop = key.stop or self.header.records
+            step = key.step or 1
+            if start < 0:
+                start += self.header.records + 1
+            if stop < 0:
+                stop += self.header.records + 1
+            if stop < start:
+                if step > 0:
+                    step = -step
+            elif stop > start:
+                if step < 0:
+                    step = -step    
+            else:
+                return []
+            if stop > self.header.records:
+                stop = self.header.records
+
+            return [self.get_record(i) for i in range(start, stop, step)]
+        else:
+            if -self.header.records > key or key >= self.header.records:
+                raise IndexError("Record index out of range")
+            if key < 0:
+                key += self.header.records 
+            return self.get_record(key)
+
+    def __iter__(self):
+        """
+        Returns an iterator over the records in the database, 
+        allowing notation like 'for record in dbf'.
+        """
+        self.file.seek(self.header.header_size)
+        return iter(self.get_record(i) for i in range(self.header.records))
+        
+    def __str__(self):
+        # return f"{self.header}\n{self.fields}\n{self.records}"
+        lastmodified = datetime.strftime(datetime(1900 + self.header.year, self.header.month, self.header.day), '%Y-%m-%d')
+        return f"""
+        File: {self.filename}
+        Size; {self.filesize}
+        Last Modified: {lastmodified}
+        Records: {self.header.records}
+"""
+    
     def _init(self):
         """
         Initializes the database structure by reading the header and fields.
@@ -219,7 +275,7 @@ class DbaseFile:
     def write(self):
         numdeleted = 0
         for record in self[:]:
-            if record['deleted']:
+            if record.get('deleted'):
                 numdeleted += 1
         self.header.records -= numdeleted
         file = open('tmp.dbf', 'wb')
@@ -500,62 +556,6 @@ class DbaseFile:
             else:
                 raise ValueError(f"Unknown field type {field.type}")
 
-    def __len__(self):
-        """
-        Returns the number of records in the database, including records marked to be deleted.
-        """
-        return self.header.records
-    
-    def __getitem__(self, key):
-        """
-        Returns from the database a single record (dictionary with field names and field values) 
-        or a list of them (if a slice is used).
-        """
-        if isinstance(key, slice):
-            start = key.start or 0
-            stop = key.stop or self.header.records
-            step = key.step or 1
-            if start < 0:
-                start += self.header.records + 1
-            if stop < 0:
-                stop += self.header.records + 1
-            if stop < start:
-                if step > 0:
-                    step = -step
-            elif stop > start:
-                if step < 0:
-                    step = -step    
-            else:
-                return []
-            if stop > self.header.records:
-                stop = self.header.records
-
-            return [self.get_record(i) for i in range(start, stop, step)]
-        else:
-            if -self.header.records > key or key >= self.header.records:
-                raise IndexError("Record index out of range")
-            if key < 0:
-                key += self.header.records 
-            return self.get_record(key)
-
-    def __iter__(self):
-        """
-        Returns an iterator over the records in the database, 
-        allowing notation like 'for record in dbf'.
-        """
-        self.file.seek(self.header.header_size)
-        return iter(self.get_record(i) for i in range(self.header.records))
-        
-    def __str__(self):
-        # return f"{self.header}\n{self.fields}\n{self.records}"
-        lastmodified = datetime.strftime(datetime(1900 + self.header.year, self.header.month, self.header.day), '%Y-%m-%d')
-        return f"""
-        File: {self.filename}
-        Size; {self.filesize}
-        Last Modified: {lastmodified}
-        Records: {self.header.records}
-"""
-    
 
 def testdb():
     global test
