@@ -84,6 +84,7 @@ Class to manipulate DBase III database files.
 - `update_record(self, index: int, record_data: dict)`: Updates an existing record in the database.
 - `save_record(self, key, record)`: Writes a record (dictionary with field names and field values) to the database at the specified index. Params: key is the index (0 based position in dbf file). record is a dictionary corresponding to an item in the database (i.e: {'id': 1, 'name': "Jane Doe"}) Used internally by `update_record` 
 - `del_record(self, key, value = True)`: Marks for deletion the record identified by the index 'key', or unmarks it if `value == False`. To efectively erase the record from disk the deletion must be confirmed by using `dbasefileobj.write()`
+- `write(self, filename=None)`: Writes the current file to disk, skipping records marked for deletion. If a filename is provided, other the current filename, saves the database file to the new destination, keeping previous filename as is.
 
 ### Data searching/filtering methods
 
@@ -91,6 +92,7 @@ Class to manipulate DBase III database files.
 -  `find(self, fieldname, value, start=0, comp_func=None)`: Wrapper for search() with funcname="find". Returns the first record (dictionary) found, or None if no record meeting given criteria is found.
 -  `index(self, fieldname, value, start=0, comp_func=None)`:  Wrapper for search() with funcname="index". Returns index of the first record found, or -1 if no record meeting given criteria is found.
 -  `filter(self, fieldname, value, comp_func=None)`: Returns a list of records (dictionaries) that meet the specified criteria.
+- `exec(self, sql_cmd:str)`: Meant for retrieving data in a custom manner. Not operational yet. Invoking it raises a NotImplemented error. 
 
 ### Data listing methods
 

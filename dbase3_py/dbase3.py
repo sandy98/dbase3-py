@@ -272,7 +272,7 @@ class DbaseFile:
         assert(self.header.header_size + self.datasize == self.filesize)
         # self.file.seek(self.header.header_size)
 
-    def write(self):
+    def write(self, filename=None):
         numdeleted = 0
         for record in self[:]:
             if record.get('deleted'):
@@ -304,7 +304,10 @@ class DbaseFile:
         # file.write(b'\x1A')
         file.flush()
         self.file.close()
-        os.remove(self.filename)
+        if not filename:
+            filename = self.filename
+            os.remove(filename)
+        self.filename = filename
         os.rename('tmp.dbf', self.filename)
         self.file = open(self.filename, 'r+b')
         self.num_fields = 0
@@ -556,6 +559,11 @@ class DbaseFile:
             else:
                 raise ValueError(f"Unknown field type {field.type}")
 
+    def exec(self, sql_cmd: str):
+        """
+        Executes a SQL command on the database.
+        """
+        raise NotImplementedError("SQL commands are not supported as yet.")
 
 def testdb():
     global test
