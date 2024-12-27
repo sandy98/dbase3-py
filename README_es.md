@@ -74,10 +74,11 @@ Clase para manipular archivos de base de datos DBase III.
 - `_init(self)`: Inicializa la estructura de la base de datos leyendo el encabezado y los campos. Destinado para uso privado por parte de instancias de DBaseFile.
 - `def _test_key(self, key)`: Comprueba si la clave está dentro del rango válido de índices de registros. Genera un error de índice si la clave está fuera del rango. Solo para uso interno.
     
-### Class Methods
+### Métodos de clase
 
 - `create(cls, filename: str, fields: List[Tuple[str, FieldType, int, int]])`: Crea un nuevo archivo de base de datos DBase III con los campos especificados. Devuelve un objeto DbaseFile que apunta al archivo dbase recién creado.
-### Data Manipulation methods
+
+### Métodos de manipulation de datos
 
 - `add_record(self, record_data: dict)`: Agrega un nuevo registro a la base de datos.
 - `update_record(self, index: int, record_data: dict)`: Actualiza un registro existente en la base de datos.
@@ -85,19 +86,21 @@ Clase para manipular archivos de base de datos DBase III.
 - `del_record(self, key, value = True)`: Marca para su eliminación el registro identificado por el índice 'clave', o lo desmarca si `value == False`. Para borrar efectivamente el registro del disco, la eliminación debe confirmarse utilizando `dbasefileobj.write()`
 - `write(self, filename=None)`: Escribe el archivo actual en el disco, omitiendo los registros marcados para su eliminación. Si se proporciona un nombre de archivo distinto del actual, se guarda el archivo de base de datos en el nuevo destino y se conserva el nombre de archivo anterior.
 
-### Data searching/filtering methods
+### Métodos de búsqueda/filtrado de datos
 
 -  `search(self, fieldname, value, start=0, funcname="", comp_func=None)`: Escribe el archivo actual en el disco, omitiendo los registros marcados para su eliminación. Si se proporciona un nombre de archivo distinto del actual, se guarda el archivo de base de datos en el nuevo destino y se conserva el nombre de archivo anterior.
 -  `find(self, fieldname, value, start=0, comp_func=None)`: Contenedor para search() con funcname="find". Devuelve el primer registro (diccionario) encontrado, o None si no se encuentra ningún registro que cumpla los criterios dados.
 -  `index(self, fieldname, value, start=0, comp_func=None)`:  Contenedor para search() con funcname="index". Devuelve el índice del primer registro encontrado o -1 si no se encuentra ningún registro que cumpla los criterios dados.
 -  `filter(self, fieldname, value, comp_func=None)`: Devuelve una lista de registros (diccionarios) que cumplen los criterios especificados.
 - `exec(self, sql_cmd:str)`: Diseñado para recuperar datos de forma personalizada. Aún no está operativo. Al invocarlo, se genera un error NotImplemented.
-### Data listing methods
+
+### Métodos de listado de datos
 
 -  `list(self, start=0, stop=None, fieldsep="|", recordsep='\n', records:list=None)`: Devuelve una lista de registros de la base de datos, comenzando en 'start', terminando en 'stop' o EOF, con campos separados por 'fieldsep' y registros separados por '\n'. Si 'records' no es None, se utiliza la lista proporcionada en lugar de recuperar valores de la base de datos.
 -  `csv(self, start=0, stop=None, records:list = None)`: Contenedor para 'lista', que utiliza "," como separador de campos.
 -  `table(self, start=0, stop=None, records:list = None)`: Recupera registros seleccionados utilizando el formato ad-hoc, el mismo que proporciona la CLI de sqlite3 en modo .table.
-### Static Methods (Auxiliary functions for searching/filtering)
+
+### Métodos estáticos (Funciones auxiliares para búsqueda/filtrado de datos)
 
 - `istartswith(f: str, v: str) -> bool`: Comprueba si la cadena `f` comienza con la cadena `v`, ignorando mayúsculas y minúsculas.
 - `iendswith(f: str, v: str) -> bool`: Comprueba si la cadena `f` termina con la cadena `v`, ignorando mayúsculas y minúsculas.
@@ -109,7 +112,8 @@ Clase para manipular archivos de base de datos DBase III.
 ## Licencia
 
 Este proyecto está licenciado bajo la licencia MIT. Consulte el archivo LICENCIA para obtener más detalles.
-## Contact
+
+## Contacto
 
 Para cualquier duda o sugerencia, por favor contacte con nosotros. [Domingo E. Savoretti](mailto:esavoretti@gmail.com).
 
