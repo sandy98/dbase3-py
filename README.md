@@ -48,23 +48,46 @@ The module itself, DBaseFile class and all its methods are thoroughly documented
 
 Class to manipulate DBase III database files.
 
-### Methods
+### Dunder and 'private' Methods
 
-- `__init__(self, filename: str)`: Initializes an instance of DBase3.
+- `__init__(self, filename: str)`: Initializes an instance of DBase3File from an existing dbf file.
 - `__del__(self)`: Closes the database file when the instance is destroyed.
-- `__len__(self)`: Returns the number of records in the database, including records marked to be deleted.
-- `__getitem__(self, key)`: Returns a single record or a list of records from the database.
-- `__iter__(self)`: Returns an iterator over the records in the database.
+- `__len__(self)`: Returns the number of records in the database, including records marked to be deleted. Allows writing: `len(dbasefileobj)`
+- `__getitem__(self, key)`: Returns a single record or a list of records (if slice notation is used) from the database. Allows: `dbasefileobj[3]` or `dbasefileobj[3:7]`  
+- `__iter__(self)`: Returns an iterator over the records in the database. Allows `for record in dbasefileobj: ...`
 - `__str__(self)`: Returns a string representation of the database.
+- `_init(self)`: Initializes the database structure by reading the header and fields. Meant for private use by DBaseFile instances.
+- `def _test_key(self, key)`: Tests if the key is within the valid range of record indexes. Raises an IndexError if the key is out of range. Meant for internal use only.
+    
+### Class Methods
 
-- `init(self)`: Initializes the database structure by reading the header and fields.
+- `create(cls, filename: str, fields: List[Tuple[str, FieldType, int, int]])`: Creates a new DBase III database file with the specified fields. Returns a DbaseFile object pointing to newly created dbase file.
+
+### Data Manipulation methods
+
 - `add_record(self, record_data: dict)`: Adds a new record to the database.
 - `update_record(self, index: int, record_data: dict)`: Updates an existing record in the database.
+- `save_record(self, key, record)`: Writes a record (dictionary with field names and field values) to the database at the specified index. Params: key is the index (0 based position in dbf file). record is a dictionary corresponding to an item in the database (i.e: {'id': 1, 'name': "Jane Doe"}) Used internally by `update_record` 
+- `del_record(self, key, value = True)`: Marks for deletion the record identified by the index 'key', or unmarks it if `value == False`. To efectively erase the record from disk the deletion must be confirmed by using `dbasefileobj.write()`
+
+### Data searching/filtering methods
+
+-  `search(self, fieldname, value, start=0, funcname="", comp_func=None)`:         Searches for a record with the specified value in the specified field, starting from the specified index, for which the specified comparison function returns True.
+-  `find(self, fieldname, value, start=0, comp_func=None)`:
+-  `index(self, fieldname, value, start=0, comp_func=None)`:
+-  `filter(self, fieldname, value, comp_func=None)`:
+
+### Data listing methods
+
+-  ``:
+-  ``:
+-  ``:
+
+### Static Methods (Auxiliary functions for searching/filtering)
+
 - `istartswith(f: str, v: str) -> bool`: Checks if the string `f` starts with the string `v`, ignoring case.
 - `iendswith(f: str, v: str) -> bool`: Checks if the string `f` ends with the string `v`, ignoring case.
-- `create(cls, filename: str, fields: List[Tuple[str, FieldType, int, int]])`: Creates a new DBase III database file with the specified fields.
-- `save_record(self, key, record)`: Writes a record (dictionary with field names and field values) to the database at the specified index. Params: key is the index (0 based position in dbf file). record is a dictionary corresponding to an item in the database (i.e: {'id': 1, 'name': "Jane Doe"})
- 
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.

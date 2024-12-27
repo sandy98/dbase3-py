@@ -111,7 +111,7 @@ class DbaseFile:
         __len__(self)
         __getitem__(self, key)
         __iter__(self)
-        init(self)
+         _init(self)
         istartswith(f: str, v: str) -> bool
         iendswith(f: str, v: str) -> bool
         create(cls, filename: str, fields: List[Tuple[str, FieldType, int, int]])
@@ -191,7 +191,7 @@ class DbaseFile:
         self.fields = []
         self.header = None
         self.datasize = 0
-        self.init()
+        self. _init()
 
     def __del__(self):
         """
@@ -199,7 +199,7 @@ class DbaseFile:
         """
         self.file.close()
 
-    def init(self):
+    def _init(self):
         """
         Initializes the database structure by reading the header and fields.
         """
@@ -255,7 +255,7 @@ class DbaseFile:
         self.fields = []
         self.header = None
         self.datasize = 0
-        self.init()
+        self. _init()
 
     # def add_field(self, name, type, length, decimal=0):
     #     if len(self.records) > 0:
@@ -372,8 +372,7 @@ class DbaseFile:
                 return field
         return None
 
-    def search(self, fieldname, value, start=0, funcname="", 
-               comp_func=None):
+    def search(self, fieldname, value, start=0, funcname="", comp_func=None):
         """
         Searches for a record with the specified value in the specified field,
         starting from the specified index, for which the specified comparison function returns True.
@@ -426,6 +425,19 @@ class DbaseFile:
         """ 
         return self.search(fieldname, value, start, "index", comp_func)
 
+    def filter(self, fieldname, value, comp_func=None):
+        """
+        Returns a list of records (dictionaries) that meet the specified criteria.
+        """
+        ret = []
+        index = -1
+        while True:
+            index, record = self.search(fieldname, value, index + 1, "", comp_func)  
+            if index < 0:
+                return ret
+            else:    
+                ret.append(record)
+
     def list(self, start=0, stop=None, fieldsep="|", recordsep='\n', records:list=None):
         """
         Returns a list of records from the database.
@@ -464,19 +476,6 @@ class DbaseFile:
         record_lines =  ('\n' + line_divider).join("|" + "|".join(_format_field(field, record) for field in self.fields) + "|" for record in l)
         return line_divider + header_line + line_divider + record_lines + "\n" + line_divider
     
-    def filter(self, fieldname, value, comp_func=None):
-        """
-        Returns a list of records (dictionaries) that meet the specified criteria.
-        """
-        ret = []
-        index = -1
-        while True:
-            index, record = self.search(fieldname, value, index + 1, "", comp_func)  
-            if index < 0:
-                return ret
-            else:    
-                ret.append(record)
-
     def save_record(self, key, record):
         """
         Writes a record (dictionary with field names and field values) to the database
