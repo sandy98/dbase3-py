@@ -78,7 +78,7 @@ Clase para manipular archivos de base de datos DBase III.
 
 - `create(cls, filename: str, fields: List[Tuple[str, FieldType, int, int]])`: Crea un nuevo archivo de base de datos DBase III con los campos especificados. Devuelve un objeto DbaseFile que apunta al archivo dbase recién creado.
 
-### Métodos de manipulation de datos
+### Métodos de manipulación de datos
 
 - `add_record(self, record_data: dict)`: Agrega un nuevo registro a la base de datos.
 - `update_record(self, index: int, record_data: dict)`: Actualiza un registro existente en la base de datos.
