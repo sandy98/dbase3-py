@@ -48,31 +48,22 @@ The module itself, DBaseFile class and all its methods are thoroughly documented
 
 Class to manipulate DBase III database files.
 
-- `__init__(self, filename: str)`: Initializes an instance of DBase3.
-- `__del__(self)`: Closes the database file when the instance is destroyed.
-- `init(self)`: Initializes the database structure by reading the header and fields.
-- 
-
-add_record(self, record_data: dict)
-
-: Adds a new record to the database.
-
-- `update_record(self, index: int, record_data: dict)`: Updates an existing record in the database.
-- `istartswith(f: str, v: str) -> bool`: Checks if the string `f` starts with the string `v`, ignoring case.
-- `iendswith(f: str, v: str) -> bool`: Checks if the string `f` ends with the string `v`, ignoring case.
-- 
-
-create(cls, filename: str, fields: List[Tuple[str, FieldType, int, int]])
-
-: Creates a new DBase III database file with the specified fields.
-
 ### Methods
 
-- `save_record(self, key, record)`: Writes a record (dictionary with field names and field values) to the database at the specified index. Params: key is the index (0 based position in dbf file). record is a dictionary corresponding to an item in the database (i.e: {'id': 1, 'name': "Jane Doe"})
+- `__init__(self, filename: str)`: Initializes an instance of DBase3.
+- `__del__(self)`: Closes the database file when the instance is destroyed.
 - `__len__(self)`: Returns the number of records in the database, including records marked to be deleted.
 - `__getitem__(self, key)`: Returns a single record or a list of records from the database.
 - `__iter__(self)`: Returns an iterator over the records in the database.
 - `__str__(self)`: Returns a string representation of the database.
+
+- `init(self)`: Initializes the database structure by reading the header and fields.
+- `add_record(self, record_data: dict)`: Adds a new record to the database.
+- `update_record(self, index: int, record_data: dict)`: Updates an existing record in the database.
+- `istartswith(f: str, v: str) -> bool`: Checks if the string `f` starts with the string `v`, ignoring case.
+- `iendswith(f: str, v: str) -> bool`: Checks if the string `f` ends with the string `v`, ignoring case.
+- `create(cls, filename: str, fields: List[Tuple[str, FieldType, int, int]])`: Creates a new DBase III database file with the specified fields.
+- `save_record(self, key, record)`: Writes a record (dictionary with field names and field values) to the database at the specified index. Params: key is the index (0 based position in dbf file). record is a dictionary corresponding to an item in the database (i.e: {'id': 1, 'name': "Jane Doe"})
  
 ## Contributing
 
