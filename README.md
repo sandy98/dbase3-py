@@ -40,7 +40,6 @@ print(test.filter('name', 'ja', comp_func=self.istartswith))
 
 The module itself, DBaseFile class and all its methods are thoroughly documented, so it should be easy to follow up.
 
-
 ## Documentation
 
 ### Classes
@@ -69,12 +68,12 @@ create(cls, filename: str, fields: List[Tuple[str, FieldType, int, int]])
 
 ### Methods
 
-- `dump_record(self, key, record)`: Writes a record (dictionary with field names and field values) to the database at the specified index.
+- `save_record(self, key, record)`: Writes a record (dictionary with field names and field values) to the database at the specified index. Params: key is the index (0 based position in dbf file). record is a dictionary corresponding to an item in the database (i.e: {'id': 1, 'name': "Jane Doe"})
 - `__len__(self)`: Returns the number of records in the database, including records marked to be deleted.
 - `__getitem__(self, key)`: Returns a single record or a list of records from the database.
 - `__iter__(self)`: Returns an iterator over the records in the database.
 - `__str__(self)`: Returns a string representation of the database.
-
+ 
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.
@@ -86,5 +85,7 @@ This project is licensed under the MIT License. See the LICENSE file for details
 ## Contact
 
 For any questions or suggestions, please contact [Domingo E. Savoretti](mailto:esavoretti@gmail.com).
+
+```
 
 ```

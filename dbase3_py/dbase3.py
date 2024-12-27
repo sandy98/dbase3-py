@@ -124,7 +124,7 @@ class DbaseFile:
         find(self, fieldname, value, start=0, comp_func=None)
         index(self, fieldname, value, start=0, comp_func=None)
         filter(self, fieldname, value, comp_func=None)
-        dump_record(self, key, record)
+        save_record(self, key, record)
         write(self)
     """
     
@@ -316,7 +316,7 @@ class DbaseFile:
         self._test_key(key)
         record = self.get_record(key)
         record['deleted'] = value
-        self.dump_record(key, record)
+        self.save_record(key, record)
         self.file.flush()
 
     def update_record(self, key, record):
@@ -329,7 +329,7 @@ class DbaseFile:
         """
         self._test_key(key)
         record['deleted'] = False
-        self.dump_record(key, record)
+        self.save_record(key, record)
         self.file.flush()
 
     def get_record(self, key):
@@ -477,7 +477,7 @@ class DbaseFile:
             else:    
                 ret.append(record)
 
-    def dump_record(self, key, record):
+    def save_record(self, key, record):
         """
         Writes a record (dictionary with field names and field values) to the database
         at the specified index.
