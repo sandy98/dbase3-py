@@ -12,7 +12,10 @@ else:
     sys.exit(1)
 
 from functools import reduce
-from dbase3 import DbaseFile
+try:
+    from dbase3_py.dbase3 import DbaseFile
+except ImportError:
+    from dbase3 import DbaseFile
 
 def show(stdscr, title, subtitle, text):
     max_line_length = reduce(lambda x, y: max(x, len(y)), text, 0)
