@@ -103,7 +103,7 @@ def show(stdscr, title, subtitle, text):
     # Draw the title and subtitle once
     height, width = stdscr.getmaxyx()
     stdscr.addstr(0, 0, title[:width - 1].center(width), curses.color_pair(3))
-    stdscr.addstr(1, 0, subtitle[:width - 1].center(width), curses.color_pair(4))
+    stdscr.addstr(1, 0, subtitle[:width - 1].ljust(width).rjust(len(subtitle)+1), curses.color_pair(4))
 
     index = 0
     start_line = 0  # Line in the list where the visible window starts
