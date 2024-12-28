@@ -18,4 +18,9 @@ setup(
         'Operating System :: OS Independent',
     ],
     python_requires='>=3.6',
+    entry_points={
+        'console_scripts': [
+            'dbfview=dbase3_py.dbfview:main',
+        ],
+    },    
 )
