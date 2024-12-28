@@ -29,6 +29,8 @@ pip install dbase3-py
 
 ## Utilizzo
 
+### Classe principale
+
 ```python
 from dbase3_py.dbase3 import DBaseFile, FieldType
 test = DbaseFile.create('db/test.dbf',
@@ -43,6 +45,13 @@ print(test[:])
 print(test.filter('name', 'ja', comp_func=self.istartswith))
 
 ```
+
+### Utilità di navigazione del database
+
+```bash
+python3 dbfview.py <dbf_file>
+```
+Una comoda utilità basata su CLI curses per esplorare i file .dbf.
 
 Il modulo stesso, la classe DBaseFile e tutti i suoi metodi sono ampiamente documentati, quindi dovrebbe essere facile da seguire.
 
