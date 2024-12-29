@@ -19,7 +19,7 @@ import struct, os
 from mmap import mmap as memmap, ACCESS_WRITE
 from enum import Enum
 from typing import List, Dict, Tuple, Callable, AnyStr, ByteString
-from dataclasses import dataclass #, fields, field, is_dataclass
+from dataclasses import dataclass, field #, fields, field, is_dataclass
 from datetime import datetime
 
 getYear = lambda: datetime.now().year - 1900
@@ -176,6 +176,25 @@ class DbaseFile:
             file.write(b'\x0D')
         dbf = cls(filename)
         return dbf
+
+    @property
+    def field_names(self):
+        return [field.name.decode('latin1').strip() for field in self.fields]
+    
+    @property
+    def field_types(self):
+        return [chr(field.type) for field in self.fields]
+    
+    @property
+    def field_lengths(self):
+        return [field.length for field in self.fields]
+    
+    def max_field_length(self, fieldname):
+        return max([len(fieldname),max(len(str(record[fieldname])) for record in self[:])])
+    
+    @property
+    def max_field_lengths(self):
+        return [self.max_field_length(field) for field in self.field_names]
 
     def __init__(self, filename):
         """
@@ -410,7 +429,10 @@ class DbaseFile:
             if fieldtype == 'C':
                 record[fieldname] = rec_bytes[:field.length].decode('latin1').strip("\0x00").strip()
             elif fieldtype == 'N':
-                record[fieldname] = int(rec_bytes[:field.length])
+                try: 
+                    record[fieldname] = int(rec_bytes[:field.length])
+                except ValueError:
+                    record[fieldname] = float(rec_bytes[:field.length])
             elif fieldtype == 'F':
                 record[fieldname] = float(rec_bytes[:field.length])
             elif fieldtype == 'D':
@@ -514,6 +536,12 @@ class DbaseFile:
         """
         return self.list(start, stop, ",", "\n", records)
     
+    def csv_headers_line(self):
+        """
+        Returns a CSV string with the field names.
+        """
+        return ",".join(self.field_names)
+    
     def table(self, start=0, stop=None, records:list = None):
         """
         Returns a table string with the records in the database.
@@ -534,6 +562,33 @@ class DbaseFile:
         header_line = "|" + "|".join(field.name.decode('latin1').center(field.length + 2) for field in self.fields) + "|" + "\n"
         record_lines =  ('\n' + line_divider).join("|" + "|".join(_format_field(field, record) for field in self.fields) + "|" for record in l)
         return line_divider + header_line + line_divider + record_lines + "\n" + line_divider
+
+    def line(self, index, fieldsep=""):
+        """
+        Returns a string with the record at the specified index, with fields right aligned to max field lengths.
+        """
+        record = self.get_record(index)
+        names_lengths = zip(self.field_names, self.max_field_lengths)
+        afields = [f"{str(record.get(name)).rjust(length).ljust(length+1)}" for name, length in names_lengths]
+        return fieldsep.join(afields)
+    
+    def lines(self, start=0, stop=None, fieldsep="", recordsep='\n'):
+        """
+        Returns an array of string with the records in the specified range, with fields right aligned to max field lengths.
+        """
+        if start is None:
+            start = 0
+        if stop is None:
+            stop = self.header.records
+        return recordsep.join([self.line(i, fieldsep) for i in range(start, stop)])
+    
+    def headers_line(self, fieldsep=""):
+        """
+        Returns a string containing the field names right aligned to max field lengths.
+        """
+        names_lengths = zip(self.field_names, self.max_field_lengths)
+        afields = [f"{name.rjust(length).ljust(length+1)}" for name, length in names_lengths]
+        return fieldsep.join(afields)
     
     def save_record(self, key, record):
         """

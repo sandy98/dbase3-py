@@ -94,8 +94,17 @@ def main():
         sys.exit(1)
     dbf = DbaseFile(filename)
     title = f"{filename} - {dbf.header.records} records"
-    text = dbf.csv().split('\n')
-    subtitle = "Use arrow keys to scroll, 'q' to quit"
+    # subtitle = "Use arrow keys to scroll, 'q' to quit"
+    if dbf.header.records == 0:
+        text = ["No records found."]
+    elif dbf.header.records > 1000:
+        func = dbf.csv
+        subtitle = dbf.csv_headers_line()
+    else:
+        func = dbf.lines       
+        subtitle = dbf.headers_line()
+         
+    text = func().split('\n')
     curses.wrapper(lambda stdscr: show(stdscr, title, subtitle, text))
 
 
