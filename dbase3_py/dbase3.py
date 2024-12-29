@@ -21,6 +21,10 @@ from enum import Enum
 from typing import List, Dict, Tuple, Callable, AnyStr, ByteString
 from dataclasses import dataclass, field #, fields, field, is_dataclass
 from datetime import datetime
+from multiprocessing.pool import ThreadPool
+# from multiprocessing import Pool
+from threading import Lock
+# from multiprocessing import Lock
 
 getYear = lambda: datetime.now().year - 1900
 getMonth = lambda: datetime.now().month
@@ -183,6 +187,7 @@ class DbaseFile:
 
         :param filename: Name of the database file.
         """
+        self.lock = Lock()
         self.filename = filename
         self.filesize = os.path.getsize(filename)
         self.file = open(filename, 'r+b')
@@ -284,11 +289,35 @@ class DbaseFile:
         return [field.length for field in self.fields]
     
     def max_field_length(self, fieldname):
-        return max([len(fieldname),max(len(str(record[fieldname])) for record in self[:])])
+        """
+        Returns the maximum length of the specified field (including length of field name) in the database.
+        """
+        with self.lock:
+            records = self[:]
+            records = filter(lambda r: r is not None, records)
+            max_record_len = max((len(str(record[fieldname])) for record in records))
+            return max([len(fieldname), max_record_len])
     
     @property
     def max_field_lengths(self):
+        """
+        Returns the maximum length of each field (including length of field name) in the database.
+        """
         return [self.max_field_length(field) for field in self.field_names]
+
+    @property
+    def tmax_field_lengths(self):
+        """
+        Returns the maximum length of each field (including length of field name) in the database.
+        Threaded version.
+        """
+        res = []
+        fields = self.field_names
+        with ThreadPool() as pool:
+        # with Pool() as pool:
+            for result in pool.map(self.max_field_length, fields):
+                res.append(result)
+        return res
 
     def write(self, filename=None):
         numdeleted = 0
@@ -425,19 +454,27 @@ class DbaseFile:
         for field in self.fields:
             fieldtype = chr(field.type)
             fieldname = field.name.decode('latin1').strip("\0x00").strip()
+            fieldcontent = rec_bytes[:field.length].decode('latin1').strip("\0x00").strip()
             if fieldtype == 'C':
-                record[fieldname] = rec_bytes[:field.length].decode('latin1').strip("\0x00").strip()
+                record[fieldname] = fieldcontent
             elif fieldtype == 'N':
+                if fieldcontent == '':
+                    fieldcontent = 0
                 try: 
-                    record[fieldname] = int(rec_bytes[:field.length])
+                    record[fieldname] = int(fieldcontent)
                 except ValueError:
-                    record[fieldname] = float(rec_bytes[:field.length])
+                    record[fieldname] = float(fieldcontent)
             elif fieldtype == 'F':
-                record[fieldname] = float(rec_bytes[:field.length])
+                if fieldcontent == '':
+                    fieldcontent = 0
+                record[fieldname] = float(fieldcontent)
             elif fieldtype == 'D':
-                record[fieldname] = datetime.strptime(rec_bytes[:field.length].decode('latin1'), '%Y%m%d')
+                try:
+                    record[fieldname] = datetime.strptime(fieldcontent, '%Y%m%d')
+                except:
+                    record[fieldname] = fieldcontent
             elif fieldtype == 'L':
-                record[fieldname] = not not rec_bytes[:field.length]
+                record[fieldname] = not not fieldcontent
             else:
                 raise ValueError(f"Unknown field type {fieldtype}")
             rec_bytes = rec_bytes[field.length:]
@@ -579,7 +616,7 @@ class DbaseFile:
             start = 0
         if stop is None:
             stop = self.header.records
-        names_lengths = list(zip(self.field_names, self.max_field_lengths))
+        names_lengths = list(zip(self.field_names, self.tmax_field_lengths))
         return recordsep.join([self.line(i, fieldsep, names_lengths=names_lengths)
                                 for i in range(start, stop)])
     
@@ -622,7 +659,7 @@ class DbaseFile:
         raise NotImplementedError("SQL commands are not supported as yet.")
 
 def testdb():
-    global test
+    global test, medicos
     
     if os.path.exists('test.dbf'):
         # os.remove('db/test.dbf')
@@ -637,6 +674,12 @@ def testdb():
 
     print(test)
     print()
+
+    medicos = DbaseFile('db/medicos.dbf')
+    print(medicos)
+    print(medicos.tmax_field_lengths)
+
+
 
 if __name__ == '__main__':
     testdb()  
