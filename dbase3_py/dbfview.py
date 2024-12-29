@@ -61,11 +61,15 @@ def show(stdscr, title, subtitle, text):
             for i, line in enumerate(text[start_line:start_line + visible_lines]):
                 # Calculate the screen line to draw on (offset by 2 for title and subtitle)
                 screen_line = i + 2
-                if start_line + i == index:
-                    stdscr.addstr(screen_line, 0, line[:width - 1].rjust(max_line_length), curses.color_pair(2))
-                else:
-                    stdscr.addstr(screen_line, 0, line[:width - 1].rjust(max_line_length), curses.color_pair(1))
-
+                try:
+                    if start_line + i == index:
+                        attr = curses.color_pair(2)
+                    else:
+                        attr = curses.color_pair(1)
+                    stdscr.addstr(screen_line, 0, line.rjust(max_line_length)[:width-1], attr)
+                except curses.error as e:
+                    sys.stderr.write(f"Error drawing line {start_line + i}: {e}\n")
+                    sys.stderr.flush()
             # Update only changed parts of the screen
             curses.doupdate()
 
@@ -97,13 +101,13 @@ def main():
     # subtitle = "Use arrow keys to scroll, 'q' to quit"
     if dbf.header.records == 0:
         text = ["No records found."]
-    elif dbf.header.records > 1000:
+    elif dbf.header.records > 10000:
         func = dbf.csv
         subtitle = dbf.csv_headers_line()
     else:
         func = dbf.lines       
         subtitle = dbf.headers_line()
-         
+
     text = func().split('\n')
     curses.wrapper(lambda stdscr: show(stdscr, title, subtitle, text))
 

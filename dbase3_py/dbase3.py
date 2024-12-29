@@ -177,25 +177,6 @@ class DbaseFile:
         dbf = cls(filename)
         return dbf
 
-    @property
-    def field_names(self):
-        return [field.name.decode('latin1').strip() for field in self.fields]
-    
-    @property
-    def field_types(self):
-        return [chr(field.type) for field in self.fields]
-    
-    @property
-    def field_lengths(self):
-        return [field.length for field in self.fields]
-    
-    def max_field_length(self, fieldname):
-        return max([len(fieldname),max(len(str(record[fieldname])) for record in self[:])])
-    
-    @property
-    def max_field_lengths(self):
-        return [self.max_field_length(field) for field in self.field_names]
-
     def __init__(self, filename):
         """
         Initializes an instance of DBase3.
@@ -288,8 +269,26 @@ class DbaseFile:
             if not field.name:
                 break
             self.fields.append(field)
-        assert(self.header.header_size + self.datasize == self.filesize)
-        # self.file.seek(self.header.header_size)
+        # assert(self.header.header_size + self.datasize == self.filesize)
+
+    @property
+    def field_names(self):
+        return [field.name.decode('latin1').strip() for field in self.fields]
+    
+    @property
+    def field_types(self):
+        return [chr(field.type) for field in self.fields]
+    
+    @property
+    def field_lengths(self):
+        return [field.length for field in self.fields]
+    
+    def max_field_length(self, fieldname):
+        return max([len(fieldname),max(len(str(record[fieldname])) for record in self[:])])
+    
+    @property
+    def max_field_lengths(self):
+        return [self.max_field_length(field) for field in self.field_names]
 
     def write(self, filename=None):
         numdeleted = 0
@@ -563,12 +562,12 @@ class DbaseFile:
         record_lines =  ('\n' + line_divider).join("|" + "|".join(_format_field(field, record) for field in self.fields) + "|" for record in l)
         return line_divider + header_line + line_divider + record_lines + "\n" + line_divider
 
-    def line(self, index, fieldsep=""):
+    def line(self, index, fieldsep="", names_lengths:list=None):
         """
         Returns a string with the record at the specified index, with fields right aligned to max field lengths.
         """
         record = self.get_record(index)
-        names_lengths = zip(self.field_names, self.max_field_lengths)
+        names_lengths = names_lengths or zip(self.field_names, self.max_field_lengths)
         afields = [f"{str(record.get(name)).rjust(length).ljust(length+1)}" for name, length in names_lengths]
         return fieldsep.join(afields)
     
@@ -580,7 +579,9 @@ class DbaseFile:
             start = 0
         if stop is None:
             stop = self.header.records
-        return recordsep.join([self.line(i, fieldsep) for i in range(start, stop)])
+        names_lengths = list(zip(self.field_names, self.max_field_lengths))
+        return recordsep.join([self.line(i, fieldsep, names_lengths=names_lengths)
+                                for i in range(start, stop)])
     
     def headers_line(self, fieldsep=""):
         """
