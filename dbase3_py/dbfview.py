@@ -2,6 +2,7 @@
 #-*- coding: utf_8 -*-
 # dbfview.py - A simple DBF file viewer using curses
 
+import subprocess
 import os, sys
 if os.name == 'posix':
     import curses
@@ -18,6 +19,9 @@ except ImportError:
     from dbase3 import DbaseFile
 
 def show(stdscr, title, subtitle, text):
+    """
+    Shows a list of scrolling text lines under a title and subtitle in a curses window.
+    """
     max_line_length = reduce(lambda x, y: max(x, len(y)), text, 0)
     curses.cbreak()
     stdscr.keypad(True)
@@ -37,8 +41,8 @@ def show(stdscr, title, subtitle, text):
 
     # Draw the title and subtitle once
     height, width = stdscr.getmaxyx()
-    stdscr.addstr(0, 0, title[:width - 1].center(width), curses.color_pair(3))
-    stdscr.addstr(1, 0, subtitle[:width - 1].ljust(width).rjust(len(subtitle)+1), curses.color_pair(4))
+    stdscr.addstr(0, 0, title.center(width), curses.color_pair(3))
+    stdscr.addstr(1, 0, subtitle.ljust(width).rjust(len(subtitle)+1)[:width-1], curses.color_pair(4))
 
     index = 0
     start_line = 0  # Line in the list where the visible window starts
@@ -85,7 +89,11 @@ def show(stdscr, title, subtitle, text):
             index -= 1
         elif key == curses.KEY_DOWN and index < len(text) - 1:
             index += 1
-        elif key == ord('q'):  # Quit on 'q'
+        elif key == curses.KEY_PPAGE:  # Page Up
+            index = max(0, index - visible_lines)
+        elif key == curses.KEY_NPAGE:  # Page Down
+            index = min(len(text) - 1, index + visible_lines)
+        elif key == ord('q') or key == ord('Q') or key == 27:  # Quit on 'q'
             break
 
 def main():
@@ -109,8 +117,20 @@ def main():
         subtitle = dbf.headers_line()
 
     text = func().split('\n')
-    curses.wrapper(lambda stdscr: show(stdscr, title, subtitle, text))
-
+    try:
+        curses.set_escdelay(25)  # Reduce delay for ESC key
+    except:
+        pass    
+    try:
+        curses.wrapper(lambda stdscr: show(stdscr, title, subtitle, text))
+    except curses.error as e:
+        subprocess.run(["clear"])
+        sys.stderr.write(f"Error initializing curses: {e}\n")
+        sys.stderr.flush()
+        sys.exit(1)
+    except KeyboardInterrupt as e:
+        subprocess.run(["clear"])
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()  # Run the main function if the script is executed directly

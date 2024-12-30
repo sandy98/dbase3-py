@@ -8,7 +8,7 @@ This module provides a class to manipulate DBase III database files.
 It allows reading, writing, adding, updating and deleting records in the database.
 
 Classes:
-    DBaseFile
+    DBaseFile (Main class)
     DbaseHeader
     DbaseField
 """
@@ -254,9 +254,12 @@ class DbaseFile:
         # return f"{self.header}\n{self.fields}\n{self.records}"
         lastmodified = datetime.strftime(datetime(1900 + self.header.year, self.header.month, self.header.day), '%Y-%m-%d')
         return f"""
-        File: {self.filename}
-        Size; {self.filesize}
+        File version: {self.header.version}
+        File name: {self.filename}
+        File size; {self.filesize}
         Last Modified: {lastmodified}
+        Header Size: {self.header.header_size}
+        Record Size: {self.header.record_size}
         Records: {self.header.records}
 """
     
@@ -455,6 +458,7 @@ class DbaseFile:
             fieldtype = chr(field.type)
             fieldname = field.name.decode('latin1').strip("\0x00").strip()
             fieldcontent = rec_bytes[:field.length].decode('latin1').strip("\0x00").strip()
+            fieldcontent = fieldcontent.replace('\x00', ' ')
             if fieldtype == 'C':
                 record[fieldname] = fieldcontent
             elif fieldtype == 'N':
@@ -463,11 +467,17 @@ class DbaseFile:
                 try: 
                     record[fieldname] = int(fieldcontent)
                 except ValueError:
-                    record[fieldname] = float(fieldcontent)
+                    try:
+                        record[fieldname] = float(fieldcontent)
+                    except:
+                        record[fieldname] = fieldcontent
             elif fieldtype == 'F':
                 if fieldcontent == '':
                     fieldcontent = 0
-                record[fieldname] = float(fieldcontent)
+                try:
+                    record[fieldname] = float(fieldcontent)
+                except:
+                    record[fieldname] = fieldcontent
             elif fieldtype == 'D':
                 try:
                     record[fieldname] = datetime.strptime(fieldcontent, '%Y%m%d')
@@ -610,7 +620,8 @@ class DbaseFile:
     
     def lines(self, start=0, stop=None, fieldsep="", recordsep='\n'):
         """
-        Returns an array of string with the records in the specified range, with fields right aligned to max field lengths.
+        Returns a unique string resulting from concatenating an array of strings 
+        with the records in the specified range, with fields right aligned to max field lengths.
         """
         if start is None:
             start = 0
@@ -678,7 +689,7 @@ def testdb():
     medicos = DbaseFile('db/medicos.dbf')
     print(medicos)
     print(medicos.tmax_field_lengths)
-
+    input("Press Enter to continue...")
 
 
 if __name__ == '__main__':
