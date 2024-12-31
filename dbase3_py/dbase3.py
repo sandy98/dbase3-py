@@ -301,6 +301,9 @@ class DbaseFile:
 
     @property
     def field_names(self):
+        """
+        Returns a list with the names of each field in the database.
+        """
         return [field.name.strip() for field in self.fields]
     
     @property
