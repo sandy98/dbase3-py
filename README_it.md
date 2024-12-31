@@ -55,8 +55,15 @@ o, ancora meglio, se dbase3_py è installato usando pip, installerà dbfview com
 ```bash
 dbfview <dbf_file>
 ```
-
 Una comoda utilità basata su CLI curses per esplorare i file .dbf.
+
+### Utilizzo a livello di modulo
+
+Emettendo il comando:
+```bash
+python3 -m dbase3_py
+```
+viene richiamato il modulo stesso (più specificamente, __main__.py), con conseguente attraversamento del file system alla ricerca di file .dbf. Alla fine, se la ricerca ha esito positivo, all'utente viene offerto un menu numerato di file dbf esistenti, pronti per essere letti da dbfview.
 
 ### Commenti
 
