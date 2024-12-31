@@ -51,7 +51,14 @@ print(test.filter('name', 'ja', comp_func=self.istartswith))
 ```bash
 python3 dbfview.py <dbf_file>
 ```
+o, mejor aún, si se instala dbase3_py usando pip, instalará dbfview como un script, de esta manera:
+```bash
+dbfview <dbf_file>
+```
+
 Una práctica utilidad basada en CLI  curses para explorar archivos .dbf.
+
+### Comentarios
 
 El módulo en sí, la clase DBaseFile y todos sus métodos están completamente documentados, por lo que debería ser fácil seguirlo.
 
