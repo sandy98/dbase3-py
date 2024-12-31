@@ -127,6 +127,11 @@ Classe per manipolare i file di database DBase III.
 - `istartswith(f: str, v: str) -> bool`: Controlla se la stringa `f` inizia con la stringa `v`, ignorando la distinzione tra maiuscole e minuscole.
 - `iendswith(f: str, v: str) -> bool`: Controlla se la stringa `f` termina con la stringa `v`, ignorando la distinzione tra maiuscole e minuscole.
 
+### Proprietà
+
+- 'fields': Recupera l'elenco dei campi da cui vengono assemblati i record del database. Ogni oggetto campo nell'elenco ha un nome, un tipo (come da FieldType Enum) e una lunghezza.
+
+
 ## Contributi
 
 I contributi sono benvenuti! Si prega di aprire un issue o inviare una richiesta di pull.

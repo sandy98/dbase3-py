@@ -128,6 +128,10 @@ Class to manipulate DBase III database files.
 - `istartswith(f: str, v: str) -> bool`: Checks if the string `f` starts with the string `v`, ignoring case.
 - `iendswith(f: str, v: str) -> bool`: Checks if the string `f` ends with the string `v`, ignoring case.
 
+### Properties
+
+- 'fields': Retrieves the list of fields from which the database records are assembled. Each field object in the list has a name, type (as per FieldType Enum) and length.
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.

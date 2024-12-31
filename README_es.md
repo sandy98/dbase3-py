@@ -128,6 +128,10 @@ Clase para manipular archivos de base de datos DBase III.
 - `istartswith(f: str, v: str) -> bool`: Comprueba si la cadena `f` comienza con la cadena `v`, ignorando mayúsculas y minúsculas.
 - `iendswith(f: str, v: str) -> bool`: Comprueba si la cadena `f` termina con la cadena `v`, ignorando mayúsculas y minúsculas.
 
+### Propiedades
+
+- 'fields': recupera la lista de campos a partir de los cuales se ensamblan los registros de la base de datos. Cada objeto de campo de la lista tiene un nombre, un tipo (según la enumeración FieldType) y una longitud.
+
 ## Contribuciones
 
 ¡Se aceptan contribuciones! Abra un issue o envíe una solicitud de incorporación de cambios.
