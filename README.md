@@ -132,6 +132,13 @@ Class to manipulate DBase III database files.
 
 - 'fields': Retrieves the list of fields from which the database records are assembled. Each field object in the list has a name, type (as per FieldType Enum) and length.
 
+- 'field_names': Retrieves a list with the name of each field in the database.
+
+- 'field_types': Retrieves a list with the type of each field in the database.
+
+- 'field_lengths': Retrieves a list with the length of each field in the database.
+
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.

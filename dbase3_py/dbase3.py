@@ -302,21 +302,21 @@ class DbaseFile:
     @property
     def field_names(self):
         """
-        Returns a list with the names of each field in the database.
+        Returns a list with the name of each field in the database.
         """
         return [field.name.strip() for field in self.fields]
     
     @property
     def field_types(self):
         """
-        Returns a list with the types of each field in the database.
+        Returns a list with the type of each field in the database.
         """
         return [field.type for field in self.fields]
     
     @property
     def field_lengths(self):
         """
-        Returns a list with the lengths of each field in the database.
+        Returns a list with the length of each field in the database.
         """
         return [field.length for field in self.fields]
     
