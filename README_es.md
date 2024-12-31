@@ -132,6 +132,13 @@ Clase para manipular archivos de base de datos DBase III.
 
 - 'fields': recupera la lista de campos a partir de los cuales se ensamblan los registros de la base de datos. Cada objeto de campo de la lista tiene un nombre, un tipo (según la enumeración FieldType) y una longitud.
 
+- 'field_names': recupera una lista con el nombre de cada campo de la base de datos.
+
+- 'field_types': recupera una lista con el tipo de cada campo de la base de datos.
+
+- 'field_lengths': recupera una lista con la longitud de cada campo de la base de datos.
+
+
 ## Contribuciones
 
 ¡Se aceptan contribuciones! Abra un issue o envíe una solicitud de incorporación de cambios.

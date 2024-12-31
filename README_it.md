@@ -131,6 +131,12 @@ Classe per manipolare i file di database DBase III.
 
 - 'fields': Recupera l'elenco dei campi da cui vengono assemblati i record del database. Ogni oggetto campo nell'elenco ha un nome, un tipo (come da FieldType Enum) e una lunghezza.
 
+- 'field_names': Recupera un elenco con il nome di ogni campo nel database.
+
+- 'field_types': Recupera un elenco con il tipo di ogni campo nel database.
+
+- 'field_lengths': Recupera un elenco con la lunghezza di ogni campo nel database.
+
 
 ## Contributi
 
