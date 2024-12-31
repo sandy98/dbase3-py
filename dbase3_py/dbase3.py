@@ -26,20 +26,29 @@ from multiprocessing.pool import ThreadPool
 from threading import Lock
 # from multiprocessing import Lock
 
+to_bytes = lambda x: x.encode('latin1') if type(x) == str else x
+to_str = lambda x: x.decode('latin1') if type(x) == bytes else x
+
 getYear = lambda: datetime.now().year - 1900
 getMonth = lambda: datetime.now().month
 getDay = lambda: datetime.now().day
 
 class FieldType(Enum):
-    CHARACTER = b'C'
-    DATE = b'D'
-    FLOAT = b'F'
-    LOGICAL = b'L'
-    MEMO = b'M'
-    NUMERIC = b'N'
+    CHARACTER = 'C'
+    DATE = 'D'
+    FLOAT = 'F'
+    LOGICAL = 'L'
+    MEMO = 'M'
+    NUMERIC = 'N'
+
+    def __repr__(self):
+        return self.value   
 
     def __str__(self):
-        return self.value   
+        return self.value
+
+    # def __eq__(self, char):
+    #     return self.value == to_bytes(char)   
 
 
 @dataclass
@@ -87,22 +96,31 @@ class DbaseHeader:
 
 @dataclass
 class DbaseField:
-    name: bytes = b'' # 11 bytes
-    type: FieldType = b'C' # 1 byte
-    address: int = 0 # 4 bytes
-    length: int = 0 # 1 byte
-    decimal: int = 0 # 1 byte
-    reserved: bytes = b'\x00' * 14
+    name: str = '\x00' * 11  # Field name, 11 bytes
+    type: str = 'C'  # Field type (C, N, etc.), 1 byte
+    address: int = 0  # 1st reserved, 4 bytes
+    length: int = 0  # Field length (maximun 254), 1 byte 
+    decimal: int = 0  # Decimal places for numeric fields, 1 byte
+    reserved: bytes = b'\x00' * 14  #  14 reserved bytes
 
     def load_bytes(self, bytes):
-        (self.name, self.type, self.address, 
-         self.length, self.decimal, self.reserved) = struct.unpack('<11sBIBB14s', bytes)
-        self.name = self.name.strip(b'\x00')
-        # self.type = chr(self.type).encode()
+        # Extract the name as exactly 11 bytes
+        raw_name = bytes[:11].rstrip(b'\x00').strip()  # Strip null terminators
+        self.name = raw_name.decode('latin1')
+        # Extract the type and other attributes
+        self.type = chr(bytes[11])  # Field type is the next byte
+        (self.address, self.length, self.decimal, self.reserved) = struct.unpack('<IBB14s', bytes[12:])
         
     def to_bytes(self):
-        return struct.pack('<11sBIBB14s', self.name.ljust(11, b'\x00'), self.type, self.address, 
-                           self.length, self.decimal, self.reserved)
+        return struct.pack(
+            '<11sBIBB14s',
+            to_bytes(self.name)[:11].ljust(11, b'\x00'),  # Ensure name is exactly 11 bytes
+            ord(self.type),
+            self.address,
+            self.length,
+            self.decimal,
+            self.reserved
+        )
 
 
 class DbaseFile:
@@ -156,7 +174,7 @@ class DbaseFile:
         return f.lower().endswith(v.lower())
 
     @classmethod
-    def create(cls, filename: str, fields: List[Tuple[str, FieldType, int, int]]):
+    def create(cls, filename: str, fields: List[Tuple[str, str, int, int]]):
         """
         Creates a new DBase III database file with the specified fields.
 
@@ -173,9 +191,8 @@ class DbaseFile:
             file.write(header.to_bytes())
             for field in fields:
                 name, ftype, length, decimal = field
-                if type(name) == str:
-                    name = name.encode()
-                field = DbaseField(name, ord(ftype), 0, length, decimal)
+                name = to_bytes(name)
+                field = DbaseField(name, ftype, 0, length, decimal)
                 file.write(field.to_bytes())
             file.write(b'\x0D')
         dbf = cls(filename)
@@ -251,7 +268,9 @@ class DbaseFile:
         return iter(self.get_record(i) for i in range(self.header.records))
         
     def __str__(self):
-        # return f"{self.header}\n{self.fields}\n{self.records}"
+        """
+        Returns a string with information about the database file.
+        """
         lastmodified = datetime.strftime(datetime(1900 + self.header.year, self.header.month, self.header.day), '%Y-%m-%d')
         return f"""
         File version: {self.header.version}
@@ -272,23 +291,30 @@ class DbaseFile:
         self.num_fields = (self.header.header_size - 32) // 32
         self.datasize = self.header.record_size * self.header.records
         for i in range(self.num_fields):
+            raw_bytes = self.file.read(32)
             field = DbaseField()
-            field.load_bytes(self.file.read(32))
-            if not field.name:
+            field.load_bytes(raw_bytes)
+            if not field.name:  # Stop if the field name is empty
                 break
             self.fields.append(field)
         # assert(self.header.header_size + self.datasize == self.filesize)
 
     @property
     def field_names(self):
-        return [field.name.decode('latin1').strip() for field in self.fields]
+        return [field.name.strip() for field in self.fields]
     
     @property
     def field_types(self):
-        return [chr(field.type) for field in self.fields]
+        """
+        Returns a list with the types of each field in the database.
+        """
+        return [field.type for field in self.fields]
     
     @property
     def field_lengths(self):
+        """
+        Returns a list with the lengths of each field in the database.
+        """
         return [field.length for field in self.fields]
     
     def max_field_length(self, fieldname):
@@ -323,11 +349,19 @@ class DbaseFile:
         return res
 
     def write(self, filename=None):
+        """
+        Writes the database to a file. 
+        If no filename is specified, the original file is overwritten.
+        Skips records marked as deleted, thus effectively deleting them, 
+        and adjusts the header accordingly.
+        """
         numdeleted = 0
         for record in self[:]:
             if record.get('deleted'):
                 numdeleted += 1
         self.header.records -= numdeleted
+        self.filesize -= numdeleted * self.header.record_size
+        self.datasize = self.header.record_size * self.header.records
         file = open('tmp.dbf', 'wb')
         file.write(self.header.to_bytes())
         for field in self.fields:
@@ -340,15 +374,15 @@ class DbaseFile:
             else:   
                 file.write(b' ')
             for field in self.fields:
-                ftype = chr(field.type)
+                ftype = field.type
                 if ftype == 'C':
-                    file.write(record[field.name.decode('latin1')].ljust(field.length, ' ').encode('latin1'))
+                    file.write(record[field.name].ljust(field.length, ' ').encode('latin1'))
                 elif ftype == 'N' or ftype == 'F':
-                    file.write(str(record[field.name.decode('latin1')]).rjust(field.length, ' ').encode('latin1'))   
+                    file.write(str(record[field.name]).rjust(field.length, ' ').encode('latin1'))   
                 elif ftype == 'D':
-                    file.write(record[field.name.decode('latin1')].strftime('%Y%m%d').encode('latin1'))
+                    file.write(record[field.name].strftime('%Y%m%d').encode('latin1'))
                 elif ftype == 'L':
-                    file.write(b'\x01' if record[field.name.decode('latin1')] else b'\x00')
+                    file.write(b'T' if record[field.name] else b'F')
                 else:
                     raise ValueError(f"Unknown field type {field.type}")
         # file.write(b'\x1A')
@@ -396,14 +430,15 @@ class DbaseFile:
             raise ValueError("Wrong number of fields")
         value = b''
         for field, val in zip(self.fields, data):
-            ftype = chr(field.type).encode()
-            if ftype == FieldType.CHARACTER.value:
+            ftype = field.type
+            if ftype == 'C':
                 value += str(val).encode('latin1').ljust(field.length, b' ')
-            elif ftype == FieldType.NUMERIC.value or ftype == FieldType.FLOAT.value:
+            elif ftype == 'N' or ftype == 'F':
                 value += str(val).encode('latin1').rjust(field.length, b' ')
-            elif ftype == FieldType.DATE.value:
+            elif ftype == 'D':
                 value += val.strftime('%Y%m%d').encode('latin1')
-        # self.file.seek(self.header.header_size + self.header.record_size * self.header.records)
+            elif ftype == 'L':
+                value = b'T' if val else b'F'
         self.file.seek(self.filesize)
         self.file.write(b'\x20' + value)
         self.header.records += 1
@@ -437,9 +472,11 @@ class DbaseFile:
         :raises IndexError: If the record index is out of range.
         """
         self._test_key(key)
-        record['deleted'] = False
-        self.save_record(key, record)
-        self.file.flush()
+        if record['deleted']:
+            self.write()
+        else:
+            self.save_record(key, record)
+            self.file.flush()
 
     def get_record(self, key):
         """
@@ -447,17 +484,21 @@ class DbaseFile:
         Used internally by the __getitem__ method.
         """
         self._test_key(key)
-        self.file.seek(self.header.header_size + key * self.header.record_size)
+        offset = self.header.header_size + key * self.header.record_size
+        self.file.seek(offset)
         rec_bytes = self.file.read(self.header.record_size)
-        if not len(rec_bytes):
+        if len(rec_bytes) != self.header.record_size:
+            err_msg = f"Error reading record {key}: expected {self.header.record_size} bytes, got {len(rec_bytes)}"
+            os.sys.stderr.write(f"{err_msg}\n")
+            os.sys.stderr.flush()
             return None
         to_be_deleted = rec_bytes[0] == 0x2A
         rec_bytes = rec_bytes[1:]
-        record = {'deleted': to_be_deleted}
+        record = {'deleted': to_be_deleted, 'offset': offset}
         for field in self.fields:
-            fieldtype = chr(field.type)
-            fieldname = field.name.decode('latin1').strip("\0x00").strip()
-            fieldcontent = rec_bytes[:field.length].decode('latin1').strip("\0x00").strip()
+            fieldtype = field.type
+            fieldname = field.name.strip("\0x00").strip()
+            fieldcontent = rec_bytes[:field.length].decode('latin1').strip("\x00") .strip()
             fieldcontent = fieldcontent.replace('\x00', ' ')
             if fieldtype == 'C':
                 record[fieldname] = fieldcontent
@@ -484,7 +525,7 @@ class DbaseFile:
                 except:
                     record[fieldname] = fieldcontent
             elif fieldtype == 'L':
-                record[fieldname] = not not fieldcontent
+                record[fieldname] = fieldcontent in ['T', 't', 'Y', 'y']
             else:
                 raise ValueError(f"Unknown field type {fieldtype}")
             rec_bytes = rec_bytes[field.length:]
@@ -492,10 +533,10 @@ class DbaseFile:
     
     def get_field(self, fieldname):
         """
-        Returns the field object with the specified name.
+        Returns the field object with the specified name, case insensitive.
         """
         for field in self.fields:
-            if field.name.decode('latin1').strip().lower() == fieldname.strip().lower():
+            if field.name.strip().lower() == fieldname.strip().lower():
                 return field
         return None
 
@@ -509,9 +550,9 @@ class DbaseFile:
         field = self.get_field(fieldname)
         if not field:
             raise ValueError(f"Field {fieldname} not found")
-        elif fieldname != field.name.decode('latin1').strip():
-            fieldname = field.name.decode('latin1').strip()
-        fieldtype = chr(field.type).encode()
+        elif fieldname != field.name.strip():
+            fieldname = field.name.strip()
+        fieldtype = field.type
         if not comp_func:
             if fieldtype == FieldType.CHARACTER.value:
                 # comp_func = lambda f, v: f.lower().startswith(v.lower())
@@ -574,7 +615,7 @@ class DbaseFile:
         if stop is None:
             stop = self.header.records
         l = records or [self.get_record(i) for i in range(start, stop)]
-        return recordsep.join(fieldsep.join(str(record[field.name.decode('latin1')]) for field in self.fields) for record in l)
+        return recordsep.join(fieldsep.join(str(record[field.name]) for field in self.fields) for record in l)
 
     def csv(self, start=0, stop=None, records:list = None):
         """
@@ -593,10 +634,10 @@ class DbaseFile:
         Returns a table string with the records in the database.
         """
         def _format_field(field, record):
-            if field.type == ord(FieldType.CHARACTER.value):
-                return record.get(field.name.decode('latin1')).ljust(field.length + 2)
+            if field.type == FieldType.CHARACTER.value:
+                return record.get(field.name).ljust(field.length + 2)
             else: 
-                return str(record.get(field.name.decode('latin1'))).rjust(field.length + 2)
+                return str(record.get(field.name)).rjust(field.length + 2)
             
         if start is None:
             start = 0
@@ -605,7 +646,7 @@ class DbaseFile:
         l = records or [self.get_record(i) for i in range(start, stop)]
         line_bracket = "+"
         line_divider = line_bracket + line_bracket.join("-" * (field.length + 2) for field in self.fields) + line_bracket + "\n"
-        header_line = "|" + "|".join(field.name.decode('latin1').center(field.length + 2) for field in self.fields) + "|" + "\n"
+        header_line = "|" + "|".join(field.name.center(field.length + 2) for field in self.fields) + "|" + "\n"
         record_lines =  ('\n' + line_divider).join("|" + "|".join(_format_field(field, record) for field in self.fields) + "|" for record in l)
         return line_divider + header_line + line_divider + record_lines + "\n" + line_divider
 
@@ -651,17 +692,18 @@ class DbaseFile:
         else:
             self.file.write(b' ')
         for field in self.fields:
-            ftype = chr(field.type)
+            ftype = field.type
             if ftype == 'C':
-                self.file.write(record[field.name.decode('latin1')].ljust(field.length, ' ').encode('latin1'))
+                self.file.write(record[field.name].ljust(field.length, ' ').encode('latin1'))
             elif ftype == 'N' or ftype == 'F':
-                self.file.write(str(record[field.name.decode('latin1')]).rjust(field.length, ' ').encode('latin1'))
+                self.file.write(str(record[field.name]).rjust(field.length, ' ').encode('latin1'))
             elif ftype == 'D':
-                self.file.write(record[field.name.decode('latin1')].strftime('%Y%m%d').encode('latin1'))
+                self.file.write(record[field.name].strftime('%Y%m%d').encode('latin1'))
             elif ftype == 'L':
-                self.file.write(b'\x01' if record[field.name.decode('latin1')] else b'\x00')
+                self.file.write(b'\x01' if record[field.name] else b'\x00')
             else:
                 raise ValueError(f"Unknown field type {field.type}")
+        self.file.flush()
 
     def exec(self, sql_cmd: str):
         """
@@ -670,25 +712,24 @@ class DbaseFile:
         raise NotImplementedError("SQL commands are not supported as yet.")
 
 def testdb():
-    global test, medicos
+    global test, index, jdoe
     
-    if os.path.exists('test.dbf'):
-        # os.remove('db/test.dbf')
-        test = DbaseFile('test.dbf')
-        # test.add_record('River Plate', 2024 - 1901)
+    if os.path.exists('db/test.dbf'):
+        test = DbaseFile('db/test.dbf')
     else:
-        test = DbaseFile.create('test.dbf',
+        test = DbaseFile.create('db/test.dbf',
                             [('name', FieldType.CHARACTER.value, 50, 0),
                              ('age', FieldType.NUMERIC.value, 3, 0)])
         test.add_record('John Doe', 30)
         test.add_record('Jane Doe', 25)
 
-    print(test)
+    index, jdoe = test.search('name', 'John Doe')
+    jdoe['age'] += 1
+    test.update_record(index, jdoe)
+    jdoe = test[index]
+    print(jdoe)
     print()
 
-    medicos = DbaseFile('db/medicos.dbf')
-    print(medicos)
-    print(medicos.tmax_field_lengths)
     input("Press Enter to continue...")
 
 
