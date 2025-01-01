@@ -13,16 +13,19 @@ else:
     sys.exit(1)
 
 from functools import reduce
+from itertools import islice
+
 try:
     from dbase3_py.dbase3 import DbaseFile
 except ImportError:
     from dbase3 import DbaseFile
 
-def show(stdscr, title, subtitle, text):
+def show(stdscr, title, subtitle, textlines, length):
     """
     Shows a list of scrolling text lines under a title and subtitle in a curses window.
     """
-    max_line_length = reduce(lambda x, y: max(x, len(y)), text, 0)
+    textlines = list(textlines)
+    max_line_length = reduce(lambda x, y: max(x, len(y)), textlines, 0)
     curses.cbreak()
     stdscr.keypad(True)
 
@@ -62,7 +65,7 @@ def show(stdscr, title, subtitle, text):
         # Only redraw lines if scrolling or index changes
         if start_line != prev_start_line or index != prev_index:
             # Redraw visible lines
-            for i, line in enumerate(text[start_line:start_line + visible_lines]):
+            for i, line in enumerate(textlines[start_line:start_line + visible_lines]):
                 # Calculate the screen line to draw on (offset by 2 for title and subtitle)
                 screen_line = i + 2
                 try:
@@ -87,12 +90,12 @@ def show(stdscr, title, subtitle, text):
         # Handle key inputs
         if key == curses.KEY_UP and index > 0:
             index -= 1
-        elif key == curses.KEY_DOWN and index < len(text) - 1:
+        elif key == curses.KEY_DOWN and index < length - 1:
             index += 1
         elif key == curses.KEY_PPAGE:  # Page Up
             index = max(0, index - visible_lines)
         elif key == curses.KEY_NPAGE:  # Page Down
-            index = min(len(text) - 1, index + visible_lines)
+            index = min(length - 1, index + visible_lines)
         elif key == ord('q') or key == ord('Q') or key == 27:  # Quit on 'q'
             break
 
@@ -105,24 +108,25 @@ def main():
         print(f"File {filename} not found.")
         sys.exit(1)
     dbf = DbaseFile(filename)
-    title = f"{filename} - {dbf.header.records} records"
+    title, length = f"{filename} - {dbf.header.records} records", dbf.header.records
     # subtitle = "Use arrow keys to scroll, 'q' to quit"
     if dbf.header.records == 0:
-        text = ["No records found."]
-    elif dbf.header.records > 10000:
+        textlines = ["No records found."]
+    elif dbf.header.records > 1000000:
         func = dbf.csv
         subtitle = dbf.csv_headers_line()
     else:
         func = dbf.lines       
         subtitle = dbf.headers_line()
 
-    text = func().split('\n')
+    # textlines = func().split('\n')
+    textlines = func()
     try:
         curses.set_escdelay(25)  # Reduce delay for ESC key
     except:
         pass    
     try:
-        curses.wrapper(lambda stdscr: show(stdscr, title, subtitle, text))
+        curses.wrapper(lambda stdscr: show(stdscr, title, subtitle, textlines, length))
     except curses.error as e:
         subprocess.run(["clear"])
         sys.stderr.write(f"Error initializing curses: {e}\n")

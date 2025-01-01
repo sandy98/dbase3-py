@@ -475,7 +475,7 @@ class DbaseFile:
         :raises IndexError: If the record index is out of range.
         """
         self._test_key(key)
-        if record['deleted']:
+        if record.get('deleted'):
             self.write()
         else:
             self.save_record(key, record)
@@ -609,22 +609,23 @@ class DbaseFile:
             else:    
                 ret.append(record)
 
-    def list(self, start=0, stop=None, fieldsep="|", recordsep='\n', records:list=None):
+    def list(self, start=0, stop=None, fieldsep="|", records:list=None):
         """
-        Returns a list of records from the database.
+        Returns a generator, corresponding to the list of records from the database.
         """
         if start is None:
             start = 0
         if stop is None:
             stop = self.header.records
         l = records or [self.get_record(i) for i in range(start, stop)]
-        return recordsep.join(fieldsep.join(str(record[field.name]) for field in self.fields) for record in l)
-
+        # return recordsep.join(fieldsep.join(str(record[field.name]) for field in self.fields) for record in l)
+        return (fieldsep.join(str(record[field.name]) for field in self.fields) for record in l)
+    
     def csv(self, start=0, stop=None, records:list = None):
         """
-        Returns a CSV string with the records in the database.
+        Returns a generator of CSV strings, each one with the CSV repr o a record in the database.
         """
-        return self.list(start, stop, ",", "\n", records)
+        return self.list(start, stop, ",", records)
     
     def csv_headers_line(self):
         """
@@ -662,9 +663,9 @@ class DbaseFile:
         afields = [f"{str(record.get(name)).rjust(length).ljust(length+1)}" for name, length in names_lengths]
         return fieldsep.join(afields)
     
-    def lines(self, start=0, stop=None, fieldsep="", recordsep='\n'):
+    def lines(self, start=0, stop=None, fieldsep=""):
         """
-        Returns a unique string resulting from concatenating an array of strings 
+        Returns a generator which resolves to an array of strings, each one with 
         with the records in the specified range, with fields right aligned to max field lengths.
         """
         if start is None:
@@ -672,9 +673,10 @@ class DbaseFile:
         if stop is None:
             stop = self.header.records
         names_lengths = list(zip(self.field_names, self.tmax_field_lengths))
-        return recordsep.join([self.line(i, fieldsep, names_lengths=names_lengths)
-                                for i in range(start, stop)])
-    
+        # return recordsep.join([self.line(i, fieldsep, names_lengths=names_lengths)
+        #                         for i in range(start, stop)])
+        return (self.line(i, fieldsep, names_lengths=names_lengths) for i in range(start, stop)) 
+       
     def headers_line(self, fieldsep=""):
         """
         Returns a string containing the field names right aligned to max field lengths.
@@ -730,7 +732,7 @@ def testdb():
     jdoe['age'] += 1
     test.update_record(index, jdoe)
     jdoe = test[index]
-    print(jdoe)
+    print("\nHere, John Doe!\n", jdoe, "\n")
     print()
 
     input("Press Enter to continue...")
