@@ -57,6 +57,22 @@ dbfview <dbf_file>
 ```
 Una comoda utilità basata su CLI curses per esplorare i file .dbf.
 
+### Utilità di test
+
+```bash
+python3 dbftest.py [-r|-d]
+```
+o, ancora meglio, se dbase3_py è installato tramite pip, installerà dbftest come script, quindi:
+```bash
+dbftest [-r|-d]
+```
+Questo è un semplice script di test per il modulo dbase3.
+Crea un database di test (`db/test.dbf`), aggiorna alcuni record e ne elimina uno.
+Quindi scrive le modifiche nel file del database.
+Lo script può essere eseguito con l'opzione -d per mostrare i risultati intermedi o con l'opzione -r per cancellare un test.dbf esistente.
+Lo script creerà una directory 'db' nella directory corrente se non esiste.
+Lo script creerà un file 'test.dbf' nella directory 'db' se non esiste.
+
 ### Utilizzo a livello di modulo
 
 Emettendo il comando:
