@@ -106,8 +106,8 @@ Class to manipulate DBase III database files.
 - `add_record(self, record_data: dict)`: Adds a new record to the database.
 - `update_record(self, index: int, record_data: dict)`: Updates an existing record in the database.
 - `save_record(self, key, record)`: Writes a record (dictionary with field names and field values) to the database at the specified index. Params: key is the index (0 based position in dbf file). record is a dictionary corresponding to an item in the database (i.e: {'id': 1, 'name': "Jane Doe"}) Used internally by `update_record` 
-- `del_record(self, key, value = True)`: Marks for deletion the record identified by the index 'key', or unmarks it if `value == False`. To efectively erase the record from disk the deletion must be confirmed by using `dbasefileobj.write()`
-- `write(self, filename=None)`: Writes the current file to disk, skipping records marked for deletion. If a filename is provided, other the current filename, saves the database file to the new destination, keeping previous filename as is.
+- `del_record(self, key, value = True)`: Marks for deletion the record identified by the index 'key', or unmarks it if `value == False`. To efectively erase the record from disk the deletion must be confirmed by using `dbasefileobj.commit()`
+- `commit(self, filename=None)`: Formerly named `write`, it writes the current file to disk, skipping records marked for deletion. If a filename is provided, other the current filename, saves the database file to the new destination, keeping previous filename as is. Its worth noting that `add_record` and `update_record` commit changes to disk inmediatly, so it's not needed to call `commit` after using them. It won't harm to do it, either.
 
 ### Data searching/filtering methods
 

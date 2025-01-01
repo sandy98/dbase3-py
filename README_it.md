@@ -105,8 +105,8 @@ Classe per manipolare i file di database DBase III.
 - `add_record(self, record_data: dict)`: Aggiunge un nuovo record al database.
 - `update_record(self, index: int, record_data: dict)`: Aggiorna un record esistente nel database.
 - `save_record(self, key, record)`: Scrive un record (dizionario con nomi di campo e valori di campo) nel database all'indice specificato. Parametri: la chiave è l'indice (posizione basata su 0 nel file dbf). record è un dizionario corrispondente a un elemento nel database(i.e: {'id': 1, 'name': "Jane Doe"}) Utilizzato internamente da `update_record` 
-- `del_record(self, key, value = True)`: Contrassegna per l'eliminazione il record identificato dall'indice 'key', o lo deseleziona se `value == False`. Per cancellare efficacemente il record dal disco, l'eliminazione deve essere confermata tramite `dbasefileobj.write()`
-- `write(self, filename=None)`: Scrive il file corrente sul disco, saltando i record contrassegnati per l'eliminazione. Se viene fornito un nome file, diverso dal nome file corrente, salva il file del database nella nuova destinazione, mantenendo il nome file precedente così com'è.
+- `del_record(self, key, value = True)`: Contrassegna per l'eliminazione il record identificato dall'indice 'key', o lo deseleziona se `value == False`. Per cancellare efficacemente il record dal disco, l'eliminazione deve essere confermata tramite `dbasefileobj.commit()`
+- `commit(self, filename=None)`: Precedentemente denominato `write`, scrive il file corrente sul disco, saltando i record contrassegnati per l'eliminazione. Se viene fornito un nome file, diverso dal nome file corrente, salva il file del database nella nuova destinazione, mantenendo il nome file precedente così com'è. Vale la pena notare che `add_record` e `update_record` eseguono il commit delle modifiche su disco immediatamente, quindi non è necessario chiamare `commit` dopo averle usate. Non fa male farlo, comunque.
 
 ### Metodi di ricerca/filtraggio dei dati
 

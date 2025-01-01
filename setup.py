@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'dbfview=dbase3_py.dbfview:main',
+            'dbftest=dbase3_py.dbftest:testdb',
         ],
     },    
 )

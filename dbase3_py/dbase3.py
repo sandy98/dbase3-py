@@ -359,7 +359,7 @@ class DbaseFile:
                 res.append(result)
         return res
 
-    def write(self, filename=None):
+    def commit(self, filename=None):
         """
         Writes the database to a file. 
         If no filename is specified, the original file is overwritten.
@@ -370,9 +370,6 @@ class DbaseFile:
         for record in self[:]:
             if record.get('deleted'):
                 numdeleted += 1
-        self.header.records -= numdeleted
-        self.filesize -= numdeleted * self.header.record_size
-        self.datasize = self.header.record_size * self.header.records
         file = open('tmp.dbf', 'wb')
         file.write(self.header.to_bytes())
         for field in self.fields:
@@ -397,6 +394,11 @@ class DbaseFile:
                 else:
                     raise ValueError(f"Unknown field type {field.type}")
         # file.write(b'\x1A')
+        self.header.records -= numdeleted
+        self.filesize -= numdeleted * self.header.record_size
+        self.datasize = self.header.record_size * self.header.records
+        file.seek(0)
+        file.write(self.header.to_bytes())
         file.flush()
         self.file.close()
         if not filename:
@@ -484,7 +486,7 @@ class DbaseFile:
         """
         self._test_key(key)
         if record.get('deleted'):
-            self.write()
+            self.commit()
         else:
             self.save_record(key, record)
             self.file.flush()

@@ -106,8 +106,8 @@ Clase para manipular archivos de base de datos DBase III.
 - `add_record(self, record_data: dict)`: Agrega un nuevo registro a la base de datos.
 - `update_record(self, index: int, record_data: dict)`: Actualiza un registro existente en la base de datos.
 - `save_record(self, key, record)`: Escribe un registro (diccionario con nombres de campos y valores de campos) en la base de datos en el índice especificado. Parámetros: la clave es el índice (posición basada en 0 en el archivo dbf). El registro es un diccionario que corresponde a un elemento en la base de datos. (i.e: {'id': 1, 'name': "Jane Doe"}) Usado internamente por `update_record` 
-- `del_record(self, key, value = True)`: Marca para su eliminación el registro identificado por el índice 'clave', o lo desmarca si `value == False`. Para borrar efectivamente el registro del disco, la eliminación debe confirmarse utilizando `dbasefileobj.write()`
-- `write(self, filename=None)`: Escribe el archivo actual en el disco, omitiendo los registros marcados para su eliminación. Si se proporciona un nombre de archivo distinto del actual, se guarda el archivo de base de datos en el nuevo destino y se conserva el nombre de archivo anterior.
+- `del_record(self, key, value = True)`: Marca para su eliminación el registro identificado por el índice 'clave', o lo desmarca si `value == False`. Para borrar efectivamente el registro del disco, la eliminación debe confirmarse utilizando `dbasefileobj.commit()`
+- `commit(self, filename=None)`: Anteriormente llamado `write`, escribe el archivo actual en el disco, omitiendo los registros marcados para su eliminación. Si se proporciona un nombre de archivo distinto del actual, se guarda el archivo de base de datos en el nuevo destino y se conserva el nombre de archivo anterior. Vale la pena señalar que `add_record` y `update_record` confirman los cambios en el disco inmediatamente, por lo que no es necesario llamar a `commit` después de usarlos. Igualmente, no genera problemas hacerlo.
 
 ### Métodos de búsqueda/filtrado de datos
 
