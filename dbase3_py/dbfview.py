@@ -45,7 +45,7 @@ def show(stdscr, title, subtitle, textlines, length):
     # Draw the title and subtitle once
     height, width = stdscr.getmaxyx()
     stdscr.addstr(0, 0, title.center(width), curses.color_pair(3))
-    stdscr.addstr(1, 0, subtitle.ljust(width).rjust(len(subtitle)+1)[:width-1], curses.color_pair(4))
+    stdscr.addstr(1, 0, subtitle.ljust(width)[:width-1], curses.color_pair(4))
 
     index = 0
     start_line = 0  # Line in the list where the visible window starts
@@ -73,7 +73,8 @@ def show(stdscr, title, subtitle, textlines, length):
                         attr = curses.color_pair(2)
                     else:
                         attr = curses.color_pair(1)
-                    stdscr.addstr(screen_line, 0, line.rjust(max_line_length)[:width-1], attr)
+                    # stdscr.addstr(screen_line, 0, line.rjust(max_line_length)[:width-1], attr)
+                    stdscr.addstr(screen_line, 0, line[:width-1], attr)
                 except curses.error as e:
                     sys.stderr.write(f"Error drawing line {start_line + i}: {e}\n")
                     sys.stderr.flush()
@@ -112,14 +113,11 @@ def main():
     # subtitle = "Use arrow keys to scroll, 'q' to quit"
     if dbf.header.records == 0:
         textlines = ["No records found."]
-    elif dbf.header.records > 1000000:
-        func = dbf.csv
-        subtitle = dbf.csv_headers_line()
+    # elif dbf.header.records > 1000000:
+    #     func = dbf.csv
+    #     subtitle = dbf.csv_headers_line()
     else:
-        func = dbf.lines       
-        subtitle = dbf.headers_line()
-
-    # textlines = func().split('\n')
+        func, subtitle = dbf.lines, dbf.headers_line()   
     textlines = func()
     try:
         curses.set_escdelay(25)  # Reduce delay for ESC key

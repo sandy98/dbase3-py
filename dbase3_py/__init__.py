@@ -1,4 +1,4 @@
-__version__ = "1.8.1"
+__version__ = "1.8.3"
 __author__ = "Domingo E. Savoretti"
 __email__ = "esavoretti@gmail.com"
 __license__ = "MIT"

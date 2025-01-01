@@ -324,12 +324,20 @@ class DbaseFile:
         """
         Returns the maximum length of the specified field (including length of field name) in the database.
         """
-        with self.lock:
-            records = self[:]
-            records = filter(lambda r: r is not None, records)
-            max_record_len = max((len(str(record[fieldname])) for record in records))
-            return max([len(fieldname), max_record_len])
-    
+        # with self.lock:
+        #     records = self[:]
+        #     records = filter(lambda r: r is not None, records)
+        #     max_record_len = max((len(str(record[fieldname])) for record in records))
+        #     return max([len(fieldname), max_record_len])
+        field = None
+        for f in self.fields:
+            if f.name.strip() == fieldname:
+                field = f
+                break
+        if not field:
+            return 0
+        return max([len(fieldname), field.length])
+           
     @property
     def max_field_lengths(self):
         """
@@ -660,6 +668,7 @@ class DbaseFile:
         """
         record = self.get_record(index)
         names_lengths = names_lengths or zip(self.field_names, self.max_field_lengths)
+        # names_lengths = names_lengths or zip(self.field_names, self.field_lengths)
         afields = [f"{str(record.get(name)).rjust(length).ljust(length+1)}" for name, length in names_lengths]
         return fieldsep.join(afields)
     
@@ -672,7 +681,8 @@ class DbaseFile:
             start = 0
         if stop is None:
             stop = self.header.records
-        names_lengths = list(zip(self.field_names, self.tmax_field_lengths))
+        names_lengths = list(zip(self.field_names, self.max_field_lengths))
+        # names_lengths = list(zip(self.field_names, self.field_lengths))
         # return recordsep.join([self.line(i, fieldsep, names_lengths=names_lengths)
         #                         for i in range(start, stop)])
         return (self.line(i, fieldsep, names_lengths=names_lengths) for i in range(start, stop)) 
@@ -682,6 +692,7 @@ class DbaseFile:
         Returns a string containing the field names right aligned to max field lengths.
         """
         names_lengths = zip(self.field_names, self.max_field_lengths)
+        # names_lengths = zip(self.field_names, self.field_lengths)
         afields = [f"{name.rjust(length).ljust(length+1)}" for name, length in names_lengths]
         return fieldsep.join(afields)
     
