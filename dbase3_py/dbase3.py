@@ -635,6 +635,7 @@ class DbaseFile:
         """
         return self.list(start, stop, ",", records)
     
+    @property
     def csv_headers_line(self):
         """
         Returns a CSV string with the field names.
