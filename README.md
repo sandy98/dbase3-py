@@ -138,6 +138,9 @@ Class to manipulate DBase III database files.
 
 - 'field_lengths': Retrieves a list with the length of each field in the database.
 
+- 'max_field_lengths': Returns the maximum length of the specified field (including length of field name) in the database. Useful for retrieving lines with adjusted width for each field. Internally uses `def max_field_length(self, field)`
+
+- 'tmax_field_lengths': Same as max_field_lengths, threaded version, in an unsuccessful attemp of accelerating the process. Anyway, it works.
 
 ## Contributing
 
