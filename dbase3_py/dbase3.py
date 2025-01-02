@@ -49,7 +49,7 @@ class Record(Dict):
         return "\n".join(f"{k}: {v}" for k, v in self.items())
 
     def __str__(self):
-        return self.__repr__()
+        return self.__repr__() + "\n"
     
 class FieldType(Enum):
     CHARACTER = 'C'
