@@ -26,6 +26,13 @@ from multiprocessing.pool import ThreadPool
 from threading import Lock
 # from multiprocessing import Lock
 
+try:
+    from dbase3_py.utils import Dict
+except ImportError:
+    from utils import Dict
+
+
+
 to_bytes = lambda x: x.encode('latin1') if type(x) == str else x
 to_str = lambda x: x.decode('latin1') if type(x) == bytes else x
 
@@ -33,6 +40,17 @@ getYear = lambda: datetime.now().year - 1900
 getMonth = lambda: datetime.now().month
 getDay = lambda: datetime.now().day
 
+class Record(Dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.deleted = False
+
+    def __repr__(self):
+        return "\n".join(f"{k}: {v}" for k, v in self.items())
+
+    def __str__(self):
+        return self.__repr__()
+    
 class FieldType(Enum):
     CHARACTER = 'C'
     DATE = 'D'
@@ -507,7 +525,7 @@ class DbaseFile:
             return None
         to_be_deleted = rec_bytes[0] == 0x2A
         rec_bytes = rec_bytes[1:]
-        record = {'deleted': to_be_deleted, 'offset': offset}
+        record = Record({'deleted': to_be_deleted, 'offset': offset})
         for field in self.fields:
             fieldtype = field.type
             fieldname = field.name.strip("\0x00").strip()
