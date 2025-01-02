@@ -1,3 +1,6 @@
+## Aviso importante
+Este software se está descontinuando y será reemplazado por [pybase3](https://github.com/sandy98/pybase3). El motivo está puramente relacionado con la voluntad de tener un nombre más sencillo y lograr coherencia entre el nombre del paquete y el nombre del módulo. La base de código seguirá siendo prácticamente la misma, pero todo el desarrollo posterior continuará en "pybase3". Por lo tanto, se recomienda encarecidamente migrar a "pybase3". Si usa Pypi, ejecute "pip install pybase3" a partir de ahora.
+
 # Biblioteca Python para DBase III
 
 Biblioteca de Python diseñada para manipular archivos de bases de datos DBase III. Permite leer, escribir, agregar y actualizar registros en la base de datos.
