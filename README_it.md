@@ -1,3 +1,6 @@
+## Avviso importante
+Questo software è stato deprecato in favore di [pybase3](https://github.com/sandy98/pybase3). Il motivo è puramente legato alla volontà di avere un nome più semplice e di raggiungere coerenza tra il nome del pacchetto e il nome del modulo. La base di codice rimarrà in gran parte la stessa, ma tutti gli sviluppi successivi continueranno in 'pybase3'. Pertanto, è altamente consigliato migrare a 'pybase3', se si utilizza Pypi, eseguire `pip install pybase3` da ora in poi.
+
 # Libreria Python DBase III
 
 Libreria Python pensata per manipolare i file di database DBase III. Consente di leggere, scrivere, aggiungere e aggiornare i record nel database.
